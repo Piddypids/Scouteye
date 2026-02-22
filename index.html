@@ -9,9 +9,7 @@
 <meta property="og:description" content="Free daily market context dashboard. VIX, SPY, sector pulse, economic calendar. Not investment advice.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg:     #050810;
     --surf:   #0b0f1a;
@@ -27,9 +25,7 @@
     --mono:   'JetBrains Mono', monospace;
     --sans:   'Inter', system-ui, sans-serif;
   }
-
   html { scroll-behavior: smooth; }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -38,7 +34,6 @@
     line-height: 1.5;
     min-height: 100vh;
   }
-
   /* ── TOPBAR ── */
   .topbar {
     background: var(--surf2);
@@ -54,10 +49,8 @@
   .logo span { opacity: 0.5; margin: 0 6px; }
   .topbar-right { font-family: var(--mono); font-size: 11px; color: var(--text2); }
   .status-dot { color: var(--green); margin-right: 6px; }
-
   /* ── MAIN LAYOUT ── */
   .main { max-width: 1320px; margin: 0 auto; padding: 12px 16px 40px; }
-
   /* ── CARDS ── */
   .card {
     background: var(--surf);
@@ -73,7 +66,6 @@
   .card-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text2); letter-spacing: 0.1em; text-transform: uppercase; }
   .card-meta  { font-family: var(--mono); font-size: 10px; color: var(--muted); }
   .card-body  { padding: 14px 16px; }
-
   /* ── GRID LAYOUTS ── */
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -85,7 +77,6 @@
   @media(max-width: 600px) {
     .grid-3 { grid-template-columns: 1fr; }
   }
-
   /* ── BENCHMARKS BAR ── */
   .bench-bar {
     background: var(--surf2);
@@ -108,12 +99,10 @@
   .bench-label { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
   .bench-price { font-family: var(--mono); font-size: 15px; font-weight: 700; margin: 2px 0; }
   .bench-chg   { font-family: var(--mono); font-size: 10px; }
-
   /* ── HERO ── */
   .spy-big { font-family: var(--mono); font-size: 36px; font-weight: 700; line-height: 1; }
   .spy-chg { font-family: var(--mono); font-size: 16px; font-weight: 600; margin-top: 4px; }
   .spy-trend { font-size: 12px; margin-top: 4px; }
-
   .fg-big { font-family: var(--mono); font-size: 52px; font-weight: 700; line-height: 1; }
   .fg-lbl { font-family: var(--mono); font-size: 18px; font-weight: 600; margin-top: 4px; }
   .signal-row { display:flex; align-items:center; gap:8px; padding: 3px 0; }
@@ -121,14 +110,12 @@
   .signal-bar-wrap { flex:1; background:var(--surf2); height:6px; border-radius:3px; overflow:hidden; }
   .signal-bar { height:6px; border-radius:3px; transition: width 0.4s; }
   .signal-val { font-family:var(--mono); font-size:11px; width:28px; text-align:right; }
-
   .vix-big { font-family: var(--mono); font-size: 40px; font-weight: 700; line-height: 1; }
   .vix-lbl { font-family: var(--mono); font-size: 16px; font-weight: 600; margin-top: 4px; }
   .vix-range-label { font-size: 11px; margin-top: 6px; }
   .vix-bar-wrap { margin-top: 8px; }
   .vix-bar-track { background: var(--surf2); border-radius: 4px; height: 8px; overflow: hidden; border: 1px solid var(--border); }
   .vix-bar-fill  { height: 8px; border-radius: 4px; }
-
   /* ── DAILY ORIENTATION ── */
   .orientation-grid {
     display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
@@ -141,38 +128,43 @@
   .ori-val-sm { font-family:var(--mono); font-size:12px; font-weight:600; line-height:1.4; margin:4px 0; }
   .ori-sub { font-size:11px; margin-top:4px; }
   .ori-disclaimer { font-size:11px; color:var(--muted); border-top:1px solid var(--border); padding-top:10px; line-height:1.6; }
-
-  /* ── TABLES / ROWS ── */
+  /* ── NEWS & EARNINGS TABLES ── */
+  /* FIX: headlines now stack full-width, no truncation */
   .news-header, .earn-header, .cal-header {
     display: flex; gap: 8px; padding: 4px 0 6px;
     font-family: var(--mono); font-size: 9px; color: var(--muted);
     border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.08em;
   }
   .news-row, .earn-row {
-    display: flex; gap: 8px; align-items: baseline;
-    padding: 5px 6px; border-radius: 3px; font-family: var(--mono); font-size: 11px;
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 6px 6px; border-radius: 3px; font-family: var(--mono); font-size: 11px;
   }
   .news-row:nth-child(even), .earn-row:nth-child(even) { background: var(--surf2); }
-  .news-impact, .earn-impact { width: 42px; flex-shrink:0; font-weight:600; }
-  .news-age, .earn-age { width: 56px; flex-shrink:0; }
-  .news-cat  { width: 80px; flex-shrink:0; }
-  .earn-sym  { width: 52px; flex-shrink:0; }
-  .news-hl, .earn-hl { flex:1; color:var(--text); line-height:1.4; }
-
+  .news-impact, .earn-impact { width: 42px; flex-shrink:0; font-weight:600; padding-top:1px; }
+  .news-age, .earn-age { width: 56px; flex-shrink:0; padding-top:1px; }
+  .news-cat  { width: 80px; flex-shrink:0; padding-top:1px; }
+  .earn-sym  { width: 52px; flex-shrink:0; padding-top:1px; }
+  /* FIX: headlines wrap fully — no overflow hidden, no truncation */
+  .news-hl, .earn-hl {
+    flex:1;
+    color: var(--text);
+    line-height: 1.5;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
   .cal-row { display:flex; gap:10px; align-items:baseline; padding:5px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
   .cal-row:nth-child(even) { background: var(--surf2); }
   .cal-when  { width:70px; flex-shrink:0; font-weight:600; }
   .cal-date  { width:90px; flex-shrink:0; }
   .cal-event { width:130px; flex-shrink:0; }
   .cal-desc  { flex:1; }
-
   .sec-row { display:flex; align-items:center; gap:10px; padding:4px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
   .sec-row:nth-child(even) { background: var(--surf2); }
   .sec-label { width:130px; flex-shrink:0; color:var(--text2); }
   .sec-bar-wrap { flex:1; background:var(--surf2); height:6px; border-radius:3px; overflow:hidden; }
   .sec-bar { height:6px; border-radius:3px; }
   .sec-chg { width:58px; text-align:right; font-weight:600; }
-
   /* ── SURVEY ── */
   .survey-box {
     background: linear-gradient(135deg, #0b1525 0%, #0f1a2e 100%);
@@ -202,7 +194,6 @@
     transition: opacity 0.2s;
   }
   .btn-survey:hover { opacity: 0.85; }
-
   /* ── DONATE ── */
   .donate-box {
     background: var(--surf);
@@ -222,7 +213,6 @@
     transition: opacity 0.2s;
   }
   .btn-coffee:hover { opacity: 0.85; }
-
   /* ── FOOTER ── */
   .footer {
     background: #040609;
@@ -234,7 +224,6 @@
     line-height: 1.8;
   }
   .footer strong { color: #4a4a6a; }
-
   /* ── UTILS ── */
   .muted  { color: var(--muted); }
   .small  { font-size: 11px; }
@@ -242,7 +231,6 @@
   .mt16   { margin-top: 16px; }
   a       { color: var(--acc); }
   a:hover { opacity: 0.8; }
-
   /* ── SECTION DIVIDER ── */
   .section-title {
     font-family: var(--mono); font-size: 10px; font-weight: 600;
@@ -251,7 +239,6 @@
     border-bottom: 1px solid var(--border);
     margin-bottom: 10px;
   }
-
   /* ── REFRESH BANNER ── */
   .refresh-bar {
     background: var(--surf2); border: 1px solid var(--border); border-radius: 6px;
@@ -261,17 +248,17 @@
   }
   .refresh-item span { color: var(--text); }
 </style>
-<!-- GA_PLACEHOLDER -->
 </head>
 <body>
 
 <!-- TOPBAR -->
+<!-- FIX: Twitter link now correctly points to twitter.com -->
 <div class="topbar">
   <div class="logo">&#9670; SCOUT EYE <span>|</span> Daily Market Orientation</div>
   <div class="topbar-right">
     <span class="status-dot">&#9679;</span>
-    Updated: Sunday 22 February 2026  21:14 UTC &nbsp;|&nbsp; Last session &nbsp;|&nbsp;
-    <a href="#PidwellRic60200" style="color:var(--text2);text-decoration:none">@PidwellRic60200</a>
+    Updated: Sunday 22 February 2026 21:24 UTC &nbsp;|&nbsp; Last session &nbsp;|&nbsp;
+    <a href="https://twitter.com/PidwellRic60200" target="_blank" rel="noopener noreferrer" style="color:var(--text2);text-decoration:none">@PidwellRic60200</a>
   </div>
 </div>
 
@@ -285,8 +272,6 @@
 
   <!-- HERO ROW -->
   <div class="grid-hero">
-
-    <!-- Sentiment -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">Market Sentiment</span>
@@ -303,30 +288,21 @@
         <p class="muted small">Composite activates during US market hours<br>Mon–Fri 14:30–21:00 UTC</p>
       </div>
     </div>
-
-    <!-- SPY -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">S&amp;P 500 &middot; Daily Snapshot</span>
         <span class="card-meta">SPY ETF &middot; Alpaca/SIP</span>
       </div>
-      <div class="card-body">
-        <p class="muted">SPY data unavailable</p>
-      </div>
+      <div class="card-body"><p class="muted">SPY data unavailable</p></div>
     </div>
-
-    <!-- VIX -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">VIX &middot; Fear Gauge</span>
         <span class="card-meta">CBOE Volatility Index</span>
       </div>
-      <div class="card-body">
-        <p class="muted">VIX data unavailable</p>
-      </div>
+      <div class="card-body"><p class="muted">VIX data unavailable</p></div>
     </div>
-
-  </div><!-- /grid-hero -->
+  </div>
 
   <!-- DAILY ORIENTATION -->
   <div class="section-title">Daily Market Orientation</div>
@@ -336,7 +312,6 @@
       <span class="card-meta">Descriptive only &middot; not advice</span>
     </div>
     <div class="card-body">
-      
     <div class="orientation-grid">
       <div class="ori-item">
         <div class="ori-label">Volatility Regime</div>
@@ -360,7 +335,6 @@
       </div>
     </div>
     <p class="ori-disclaimer">This summary is purely descriptive. It describes observable market conditions only and does not constitute investment advice or a recommendation to buy, sell, or hold any security.</p>
-    
     </div>
   </div>
 
@@ -382,43 +356,39 @@
     </div>
   </div>
 
-  <!-- TOP STORIES + EARNINGS -->
-  <div class="grid-2">
-    <div>
-      <div class="section-title">Top Stories &middot; Last 48h &middot; By Impact</div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">News Headlines</span>
-          <span class="card-meta">Source: Hunter MemoryCore</span>
-        </div>
-        <div class="card-body">
-          <div class="news-header">
-            <span style="width:42px">Impact</span>
-            <span style="width:56px">Age</span>
-            <span style="width:80px">Category</span>
-            <span>Headline</span>
-          </div>
-          <div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">catalyst</span><span class="news-hl">[SGN] Signing Day Sports Inc. stock falls amid sector rotation - Intellectia AI</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Household Debt and Credit Report</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[BIDU] Elon Musk's Tesla Must Pay $243 Milllion In 2019 Fatal Autopilot Crash As Judge Says Evidence 'More Than Supports' Liabi</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[AG] Moderna, Coinbase, And Global Payments Are Among the Top 10 Large-Cap Gainers Last Week (Feb. 16-Feb. 20): Are the Other</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[AAPL] Consumer Tech News (Feb 16-20): Big Techs To Boost AI in India, EV Policy Shifts & More</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">NASA Delays Artemis II Launch Mission Due To Helium System Issue</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Ray Dalio Says 'Meaningful Work And Meaningful Relationships' Are Keys To Longevity, Sustained Success</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[NFLX] Donald Trump Demands Netflix Must Fire Susan Rice, Calls Her A 'Political Hack,' Says NFLX Should Act 'Immediately, Or P</span></div>
-        </div>
-      </div>
+  <!-- TOP STORIES — full width so headlines have room -->
+  <div class="section-title">Top Stories &middot; Last 48h &middot; By Impact</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">News Headlines</span>
+      <span class="card-meta">Source: Hunter MemoryCore</span>
     </div>
-    <div>
-      <div class="section-title">Earnings Radar &middot; Next 7 Days</div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Upcoming Earnings</span>
-          <span class="card-meta">Source: Hunter pipeline</span>
-        </div>
-        <div class="card-body">
-          <div class="earn-header">
-            <span style="width:42px">Impact</span>
-            <span style="width:56px">Age</span>
-            <span style="width:52px">Sym</span>
-            <span>Headline</span>
-          </div>
-          <div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+0.40</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">RBC</span><span class="earn-hl muted">RBC Raises Prologis (PLD) Target as Industrial Real Estate Outloo</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-hl muted">CFTC defends its right to prediction market enforcement as states</span></div><div class="earn-row"><span class="earn-impact" style="color:#ff4d6d">-0.30</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">TFI</span><span class="earn-hl muted">TFI International: Strength Driven By Fundamentals, But Valuation</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CEF</span><span class="earn-hl muted">CEF Market Review: The Double-Whammy Of 'Juicy Yield' CEFs</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">HIMS</span><span class="earn-hl muted">Reddit r/stocks: Hims - are earnings going to demolish it or save</span></div><div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+0.33</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">OMC</span><span class="earn-hl muted">Reddit r/investing: Omnicom’s 2025 Earnings: Why the $1.1B Loss i</span></div><div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+1.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">AMZN</span><span class="earn-hl muted">Gene Munster Predicts Nvidia Growth Will Hit 40% In 2027, Calls W</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">MGNI</span><span class="earn-hl muted">Price Over Earnings Overview: Magnite</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">GROW</span><span class="earn-hl muted">US Global Investors Q2 EPS $(0.07) Down From $(0.01) YoY, Sales $</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">MSFT</span><span class="earn-hl muted">'OpenAI Boost Revenue Forecasts, Predicts $112B More Cash Burn Th</span></div>
-        </div>
+    <div class="card-body">
+      <div class="news-header">
+        <span style="width:42px">Impact</span>
+        <span style="width:56px">Age</span>
+        <span style="width:80px">Category</span>
+        <span>Headline</span>
       </div>
+      <div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">catalyst</span><span class="news-hl">[SGN] Signing Day Sports Inc. stock falls amid sector rotation - Intellectia AI</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Household Debt and Credit Report</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[BIDU] Elon Musk's Tesla Must Pay $243 Milllion In 2019 Fatal Autopilot Crash As Judge Says Evidence 'More Than Supports' Liability</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[AG] Moderna, Coinbase, And Global Payments Are Among the Top 10 Large-Cap Gainers Last Week (Feb. 16-Feb. 20): Are the Others in Your Portfolio?</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[AAPL] Consumer Tech News (Feb 16-20): Big Techs To Boost AI in India, EV Policy Shifts & More</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">NASA Delays Artemis II Launch Mission Due To Helium System Issue</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Ray Dalio Says 'Meaningful Work And Meaningful Relationships' Are Keys To Longevity, Sustained Success</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">[NFLX] Donald Trump Demands Netflix Must Fire Susan Rice, Calls Her A 'Political Hack,' Says NFLX Should Act 'Immediately, Or Pay The Consequences'</span></div><div class="news-row"><span class="news-impact" style="color:#ff4d6d">-1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Larry Ellison Says He Was Drawn To Computers Due To Basketball, Saying It Was 'Immediate Feedback' That Got Him Hooked: 'You Win Or Lose Very Quickly'</span></div><div class="news-row"><span class="news-impact" style="color:#00e5a0">+1.00</span><span class="news-age muted">6h ago</span><span class="news-cat" style="color:#00d4ff">macro</span><span class="news-hl">Republicans Say Trump's 15% Global Tariff 'Will Be Defeated' After Supreme Court Rules Trade Authority Belongs To Congress</span></div>
+    </div>
+  </div>
+
+  <!-- EARNINGS RADAR — full width so headlines have room -->
+  <div class="section-title">Earnings Radar &middot; Next 7 Days</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Upcoming Earnings</span>
+      <span class="card-meta">Source: Hunter pipeline</span>
+    </div>
+    <div class="card-body">
+      <div class="earn-header">
+        <span style="width:42px">Impact</span>
+        <span style="width:56px">Age</span>
+        <span style="width:52px">Sym</span>
+        <span>Headline</span>
+      </div>
+      <div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+0.40</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">RBC</span><span class="earn-hl">RBC Raises Prologis (PLD) Target as Industrial Real Estate Outlook Improves</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div><div class="earn-row"><span class="earn-impact" style="color:#ff4d6d">-0.30</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">TFI</span><span class="earn-hl">TFI International: Strength Driven By Fundamentals, But Valuation And Technicals Show Potholes (Rating Downgrade)</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CEF</span><span class="earn-hl">CEF Market Review: The Double-Whammy Of 'Juicy Yield' CEFs</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">HIMS</span><span class="earn-hl">Reddit r/stocks: Hims - are earnings going to demolish it or save it?</span></div><div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+0.33</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">OMC</span><span class="earn-hl">Reddit r/investing: Omnicom’s 2025 Earnings: Why the $1.1B Loss is Actually a "Buy" Signal</span></div><div class="earn-row"><span class="earn-impact" style="color:#00e5a0">+1.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">AMZN</span><span class="earn-hl">Gene Munster Predicts Nvidia Growth Will Hit 40% In 2027, Calls Wall Street's 28% Estimate 'Too Conservative' Ahead Of Earnings</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">MGNI</span><span class="earn-hl">Price Over Earnings Overview: Magnite</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">GROW</span><span class="earn-hl">US Global Investors Q2 EPS $(0.07) Down From $(0.01) YoY, Sales $2.510M Up From $2.231M YoY</span></div><div class="earn-row"><span class="earn-impact" style="color:#ffb830">+0.00</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">MSFT</span><span class="earn-hl">'OpenAI Boost Revenue Forecasts, Predicts $112B More Cash Burn Through 2030'- The Information</span></div>
     </div>
   </div>
 
@@ -429,16 +399,14 @@
       <span class="card-title">S&amp;P 500 Sector ETFs</span>
       <span class="card-meta">XLK XLF XLE XLV XLI XLP XLY XLU &middot; Alpaca/SIP</span>
     </div>
-    <div class="card-body">
-      <p class="muted">Sector data activates Mon–Fri during US market hours.</p>
-    </div>
+    <div class="card-body"><p class="muted">Sector data activates Mon–Fri during US market hours.</p></div>
   </div>
 
   <!-- REFRESH INFO -->
   <div class="refresh-bar">
-    <div>Page generated: <span>Sunday 22 February 2026  21:14 UTC</span></div>
+    <div>Page generated: <span>Sunday 22 February 2026 21:24 UTC</span></div>
     <div>Data session: <span>Last session</span></div>
-    <div>News source: <span>Hunter MemoryCore (overnight run)</span></div>
+    <div>News source: <span>Hunter MemoryCore</span></div>
     <div>Price source: <span>Alpaca Markets SIP feed</span></div>
   </div>
 
@@ -449,26 +417,11 @@
       <div class="survey-title">Would you pay for daily access to this?</div>
       <p class="survey-sub">Scout Eye is currently free to test. Help shape what it becomes — takes 30 seconds.</p>
       <div class="price-grid">
-        <div class="price-opt">
-          <div class="price-amt">Free</div>
-          <div class="price-lbl">Always free</div>
-        </div>
-        <div class="price-opt">
-          <div class="price-amt">&pound;3&ndash;5</div>
-          <div class="price-lbl">per month</div>
-        </div>
-        <div class="price-opt">
-          <div class="price-amt">&pound;5&ndash;10</div>
-          <div class="price-lbl">per month</div>
-        </div>
-        <div class="price-opt">
-          <div class="price-amt">&pound;10&ndash;15</div>
-          <div class="price-lbl">per month</div>
-        </div>
-        <div class="price-opt">
-          <div class="price-amt">&pound;15+</div>
-          <div class="price-lbl">per month</div>
-        </div>
+        <div class="price-opt"><div class="price-amt">Free</div><div class="price-lbl">Always free</div></div>
+        <div class="price-opt"><div class="price-amt">&pound;3&ndash;5</div><div class="price-lbl">per month</div></div>
+        <div class="price-opt"><div class="price-amt">&pound;5&ndash;10</div><div class="price-lbl">per month</div></div>
+        <div class="price-opt"><div class="price-amt">&pound;10&ndash;15</div><div class="price-lbl">per month</div></div>
+        <div class="price-opt"><div class="price-amt">&pound;15+</div><div class="price-lbl">per month</div></div>
       </div>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSdEVq7JGKWBng-gQdp2oIhVOISlkr53fX-3ld2UHA8t8F2bAA/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="btn-survey">
         Take the 30-second survey &rarr;
@@ -487,25 +440,18 @@
       </a>
     </div>
 
-</div><!-- /main -->
+</div>
 
-<!-- FOOTER -->
+<!-- FOOTER — FIX: contact email removed, Scout Eye branded -->
 <div class="footer">
-  <strong>NOT INVESTMENT ADVICE</strong> &mdash; This page is for informational and orientation purposes only.
-  Nothing on this page constitutes financial, investment, or trading advice of any kind.
-  No buy, sell, or hold signals are provided or implied.<br>
-  <strong>NOT A LIVE FEED</strong> &mdash; Data is generated periodically and may lag real-time market prices.
-  Do not rely on this for time-sensitive trading decisions.<br>
-  <strong>DATA ACCURACY</strong> &mdash; Market prices sourced from Alpaca Markets SIP feed.
-  News sourced from a local pipeline database. Accuracy is not guaranteed.<br>
-  <strong>MARKET SENTIMENT COMPOSITE</strong> &mdash; An independent original composite metric.
-  Not affiliated with, endorsed by, or derived from CNN's Fear &amp; Greed Index.
-  Not predictive of future market performance.<br>
+  <strong>NOT INVESTMENT ADVICE</strong> &mdash; This page is for informational and orientation purposes only. Nothing on this page constitutes financial, investment, or trading advice of any kind. No buy, sell, or hold signals are provided or implied.<br>
+  <strong>NOT A LIVE FEED</strong> &mdash; Data is generated periodically and may lag real-time market prices. Do not rely on this for time-sensitive trading decisions.<br>
+  <strong>DATA ACCURACY</strong> &mdash; Market prices sourced from Alpaca Markets SIP feed. News sourced from a local pipeline database. Accuracy is not guaranteed.<br>
+  <strong>MARKET SENTIMENT COMPOSITE</strong> &mdash; An independent original composite metric. Not affiliated with, endorsed by, or derived from CNN's Fear &amp; Greed Index. Not predictive of future market performance.<br>
   <strong>NO LIABILITY</strong> &mdash; The creator accepts no responsibility for any financial losses arising from use of this information.<br>
-  <strong>ECONOMIC CALENDAR</strong> &mdash; Dates are approximate based on historical patterns and may differ from actual release dates.
-  Always verify with official government sources (BLS, BEA, Federal Reserve).<br>
-  &copy; 2026 Scout Eye &middot; @PidwellRic60200 &middot;
-  <a href="mailto:hello@scouteye.io" style="color:#3a3a5a">Contact</a>
+  <strong>ECONOMIC CALENDAR</strong> &mdash; Dates are approximate based on historical patterns and may differ from actual release dates. Always verify with official government sources (BLS, BEA, Federal Reserve).<br>
+  &copy; 2026 Scout Eye &middot;
+  <a href="https://twitter.com/PidwellRic60200" target="_blank" rel="noopener noreferrer" style="color:#3a3a5a">@PidwellRic60200</a>
 </div>
 
 </body>
