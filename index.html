@@ -1,752 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="refresh" content="0; url=https://web-production-4da41.up.railway.app">  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scout Eye — Daily Market Orientation</title>
-<meta name="description" content="Daily market orientation — volatility, sentiment, sector pulse, macro calendar. Not investment advice.">
-<meta property="og:title" content="Scout Eye — Daily Market Orientation">
-<meta property="og:description" content="Free daily market context dashboard. Not investment advice.">
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-31630ETYHP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-31630ETYHP');
-</script>
+<title>Starfall Sentinel</title>
+<meta name="description" content="A fast, lightweight upward shooter with waves, upgrades, bosses, and endless difficulty scaling.">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg:#050810; --surf:#0b0f1a; --surf2:#111827; --border:#1e2a3a;
-    --acc:#00d4ff; --green:#00e5a0; --red:#ff4d6d; --amber:#ffb830;
-    --muted:#4a5a6e; --text:#c8d8e8; --text2:#7a8fa8;
-    --mono:'JetBrains Mono',monospace; --sans:'Inter',system-ui,sans-serif;
+    --bg: #060812;
+    --panel: rgba(10, 16, 32, 0.82);
+    --panel-strong: rgba(14, 23, 45, 0.94);
+    --line: rgba(113, 231, 255, 0.25);
+    --cyan: #5de7ff;
+    --green: #60ffa8;
+    --gold: #ffd66b;
+    --pink: #ff5ca8;
+    --red: #ff4d6d;
+    --text: #e8f6ff;
+    --muted: #91a7bb;
+    --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
   }
-  html { scroll-behavior:smooth; }
-  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:14px; line-height:1.5; min-height:100vh; }
-  .topbar { background:var(--surf2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:10px 20px; position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
-  .logo { font-family:var(--mono); font-size:15px; font-weight:700; color:var(--acc); letter-spacing:0.05em; }
-  .logo span { opacity:0.5; margin:0 6px; }
-  .topbar-right { font-family:var(--mono); font-size:11px; color:var(--text2); }
-  .status-dot { color:var(--green); margin-right:6px; }
-  .main { max-width:1320px; margin:0 auto; padding:12px 16px 40px; }
-  .card { background:var(--surf); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
-  .card-header { padding:10px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .card-title { font-family:var(--mono); font-size:10px; font-weight:600; color:var(--text2); letter-spacing:0.1em; text-transform:uppercase; }
-  .card-meta { font-family:var(--mono); font-size:10px; color:var(--muted); }
-  .card-body { padding:14px 16px; }
-  .grid-hero { display:grid; grid-template-columns:2fr 3fr 2fr; gap:10px; margin-top:10px; }
-  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
-  @media(max-width:900px) { .grid-hero,.grid-2 { grid-template-columns:1fr; } }
-  .bench-bar { background:var(--surf2); border:1px solid var(--border); border-radius:6px; display:flex; align-items:stretch; flex-wrap:wrap; margin-top:10px; overflow:hidden; }
-  .bench-label-main { font-family:var(--mono); font-size:10px; color:var(--muted); padding:8px 14px; display:flex; align-items:center; border-right:1px solid var(--border); text-transform:uppercase; letter-spacing:0.1em; white-space:nowrap; }
-  .bench-cards { display:flex; flex:1; flex-wrap:wrap; justify-content:flex-end; }
-  .bench-card { padding:8px 14px; border-left:1px solid var(--border); min-width:100px; }
-  .bench-label { font-family:var(--mono); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
-  .bench-price { font-family:var(--mono); font-size:15px; font-weight:700; margin:2px 0; }
-  .bench-chg { font-family:var(--mono); font-size:10px; }
-  .spy-big { font-family:var(--mono); font-size:36px; font-weight:700; line-height:1; }
-  .spy-chg { font-family:var(--mono); font-size:16px; font-weight:600; margin-top:4px; }
-  .spy-trend { font-size:12px; margin-top:4px; }
-  .fg-big { font-family:var(--mono); font-size:52px; font-weight:700; line-height:1; }
-  .fg-lbl { font-family:var(--mono); font-size:18px; font-weight:600; margin-top:4px; }
-  .signal-row { display:flex; align-items:center; gap:8px; padding:3px 0; }
-  .signal-name { font-family:var(--mono); font-size:10px; color:var(--text2); width:120px; flex-shrink:0; }
-  .signal-bar-wrap { flex:1; background:var(--surf2); height:6px; border-radius:3px; overflow:hidden; }
-  .signal-bar { height:6px; border-radius:3px; }
-  .signal-val { font-family:var(--mono); font-size:11px; width:28px; text-align:right; }
-  .vix-big { font-family:var(--mono); font-size:40px; font-weight:700; line-height:1; }
-  .vix-lbl { font-family:var(--mono); font-size:16px; font-weight:600; margin-top:4px; }
-  .vix-range-label { font-size:11px; margin-top:6px; }
-  .vix-bar-wrap { margin-top:8px; }
-  .vix-bar-track { background:var(--surf2); border-radius:4px; height:8px; overflow:hidden; border:1px solid var(--border); }
-  .vix-bar-fill { height:8px; border-radius:4px; }
-  .orientation-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
-  @media(max-width:700px) { .orientation-grid { grid-template-columns:1fr 1fr; } }
-  .ori-item { background:var(--surf2); border:1px solid var(--border); border-radius:6px; padding:12px 14px; }
-  .ori-label { font-family:var(--mono); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
-  .ori-val { font-family:var(--mono); font-size:18px; font-weight:700; }
-  .ori-val-sm { font-family:var(--mono); font-size:12px; font-weight:600; line-height:1.4; margin:4px 0; }
-  .ori-sub { font-size:11px; margin-top:4px; }
-  .ori-disclaimer { font-size:11px; color:var(--muted); border-top:1px solid var(--border); padding-top:10px; line-height:1.6; }
-  .cal-header { display:flex; gap:8px; padding:4px 0 6px; font-family:var(--mono); font-size:9px; color:var(--muted); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:0.08em; }
-  .cal-row { display:flex; gap:10px; align-items:baseline; padding:5px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
-  .cal-row:nth-child(even) { background:var(--surf2); }
-  .cal-when { width:70px; flex-shrink:0; font-weight:600; }
-  .cal-date { width:90px; flex-shrink:0; }
-  .cal-event { width:130px; flex-shrink:0; }
-  .cal-desc { flex:1; }
-  /* ── NEWS ROWS ── */
-  .news-header { display:flex; gap:8px; padding:4px 0 6px; font-family:var(--mono); font-size:9px; color:var(--muted); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:0.08em; }
-  .news-row { display:flex; gap:8px; align-items:flex-start; padding:6px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
-  .news-row:nth-child(even) { background:var(--surf2); }
-  .news-arrow { width:20px; flex-shrink:0; font-size:13px; padding-top:1px; }
-  .news-age { width:56px; flex-shrink:0; padding-top:1px; }
-  .news-src { width:90px; flex-shrink:0; padding-top:1px; font-size:10px; }
-  .news-hl { flex:1; color:var(--text); line-height:1.5; white-space:normal; word-wrap:break-word; overflow-wrap:break-word; }
-  /* ── EARNINGS ROWS ── */
-  .earn-header { display:flex; gap:8px; padding:4px 0 6px; font-family:var(--mono); font-size:9px; color:var(--muted); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:0.08em; }
-  .earn-row { display:flex; gap:8px; align-items:flex-start; padding:6px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
-  .earn-row:nth-child(even) { background:var(--surf2); }
-  .earn-arrow { width:20px; flex-shrink:0; font-size:13px; padding-top:1px; }
-  .earn-age { width:56px; flex-shrink:0; padding-top:1px; }
-  .earn-sym { width:52px; flex-shrink:0; padding-top:1px; font-weight:600; }
-  .earn-src { width:90px; flex-shrink:0; padding-top:1px; font-size:10px; }
-  .earn-hl { flex:1; color:var(--text); line-height:1.5; white-space:normal; word-wrap:break-word; overflow-wrap:break-word; }
-  /* ── PAGINATION ── */
-  .news-pagination { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); font-family:var(--mono); font-size:11px; }
-  .news-page-info { color:var(--muted); }
-  .news-page-btns { display:flex; gap:8px; }
-  .page-btn {
-    background:var(--surf2); border:1px solid var(--border); color:var(--text2);
-    font-family:var(--mono); font-size:11px; padding:5px 14px; border-radius:4px;
-    cursor:pointer; transition:border-color 0.2s, color 0.2s;
-  }
-  .page-btn:hover:not(:disabled) { border-color:var(--acc); color:var(--acc); }
-  .page-btn:disabled { opacity:0.3; cursor:default; }
-  /* ── SECTORS HEAT MAP ── */
-  .sec-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; border-radius:4px; overflow:hidden; }
-  @media(max-width:600px) { .sec-grid { grid-template-columns:repeat(2,1fr); } }
-  .sec-cell { padding:12px 10px; display:flex; flex-direction:column; gap:3px; transition:opacity 0.15s; }
-  .sec-cell:hover { opacity:0.85; }
-  .sec-cell-ticker { font-family:var(--mono); font-size:11px; font-weight:700; color:var(--text); }
-  .sec-cell-name { font-size:10px; color:var(--text2); }
-  .sec-cell-chg { font-family:var(--mono); font-size:13px; font-weight:700; margin-top:4px; }
-  .sec-source { font-size:10px; margin-top:6px; }
-  /* ── WEEK CALENDAR GRID ── */
-  .week-grid { display:grid; grid-template-columns:repeat(5,1fr); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
-  @media(max-width:600px) { .week-grid { grid-template-columns:repeat(3,1fr); } }
-  .week-day { padding:10px 8px; min-height:90px; }
-  .week-day-header { margin-bottom:8px; }
-  .week-day-name { font-family:var(--mono); font-size:11px; font-weight:700; }
-  .week-day-date { font-family:var(--mono); font-size:9px; margin-top:1px; }
-  .week-ev { margin-bottom:7px; }
-  .week-ev-name { font-size:10px; color:var(--text); line-height:1.3; margin-bottom:3px; }
-  .week-ev-bar { height:2px; width:24px; border-radius:1px; }
-  .week-ev-empty { font-size:12px; }
-  /* ── FX PAIRS ── */
-  .fx-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-radius:4px; overflow:hidden; }
-  @media(max-width:500px) { .fx-grid { grid-template-columns:1fr; } }
-  .fx-card { background:var(--surf); padding:14px 16px; }
-  .fx-note { font-size:9px; margin-bottom:3px; letter-spacing:0.05em; }
-  .fx-label { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--text); margin-bottom:4px; }
-  .fx-price { font-family:var(--mono); font-size:20px; font-weight:700; }
-  .fx-chg { font-family:var(--mono); font-size:11px; margin-top:3px; }
-  /* ── FEAR & GREED GAUGE ── */
-  .fg-gauge-wrap { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
-  .fg-gauge-labels { display:flex; flex-direction:column; gap:5px; }
-  .fg-zone-row { display:flex; align-items:center; gap:7px; }
-  .fg-zone-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .fg-zone-lbl { font-family:var(--mono); font-size:9px; color:var(--text2); }
-  /* ── SURVEY / DONATE ── */
-  .survey-box { background:linear-gradient(135deg,#0b1525 0%,#0f1a2e 100%); border:1px solid #1e3a5a; border-radius:8px; padding:28px 24px; text-align:center; margin-top:10px; }
-  .survey-title { font-family:var(--mono); font-size:20px; font-weight:700; color:var(--acc); margin-bottom:10px; }
-  .survey-sub { color:var(--text2); font-size:13px; margin-bottom:20px; }
-  .price-grid { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:22px; }
-  .price-opt { background:var(--surf2); border:1px solid var(--border); border-radius:8px; padding:14px 18px; min-width:90px; }
-  .price-opt:hover { border-color:var(--acc); }
-  .price-amt { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--text); }
-  .price-lbl { font-size:11px; color:var(--muted); margin-top:4px; }
-  .btn-survey { display:inline-block; background:var(--acc); color:#050810; font-family:var(--mono); font-size:13px; font-weight:700; padding:12px 28px; border-radius:6px; text-decoration:none; letter-spacing:0.05em; transition:opacity 0.2s; }
-  .btn-survey:hover { opacity:0.85; }
-  .donate-box { background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:22px 24px; text-align:center; margin-top:10px; }
-  .donate-title { font-family:var(--mono); font-size:16px; font-weight:700; color:var(--amber); margin-bottom:8px; }
-  .btn-coffee { display:inline-block; margin-top:14px; background:var(--amber); color:#050810; font-family:var(--mono); font-size:13px; font-weight:700; padding:12px 28px; border-radius:6px; text-decoration:none; letter-spacing:0.04em; transition:opacity 0.2s; }
-  .btn-coffee:hover { opacity:0.85; }
-  .footer { background:#040609; border-top:1px solid #1a1a2e; padding:20px; margin-top:30px; font-size:11px; color:#3a3a5a; line-height:1.8; }
-  .footer strong { color:#4a4a6a; }
-  .muted { color:var(--muted); }
-  .small { font-size:11px; }
-  a { color:var(--acc); }
-  a:hover { opacity:0.8; }
-  .section-title { font-family:var(--mono); font-size:10px; font-weight:600; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; padding:20px 0 8px; border-bottom:1px solid var(--border); margin-bottom:10px; }
-  /* ── PRE-MARKET BRIEFING CARD ── */
-  .briefing-card {
-    margin-top: 10px;
-    background: linear-gradient(135deg, #070e1f 0%, #0a1428 50%, #060d1c 100%);
-    border: 1px solid #1e3a5a;
-    border-radius: 8px;
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
     overflow: hidden;
-    position: relative;
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 50% 100%, rgba(18, 121, 179, 0.22), transparent 38%),
+      radial-gradient(circle at 10% 10%, rgba(255, 92, 168, 0.16), transparent 28%),
+      linear-gradient(180deg, #101a35 0%, var(--bg) 56%, #03040a 100%);
   }
-  .briefing-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--acc), var(--green), transparent);
-  }
-  .briefing-header {
-    padding: 12px 20px;
-    border-bottom: 1px solid #1e3a5a;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 8px;
-  }
-  .briefing-header-left { display:flex; align-items:center; gap:12px; }
-  .briefing-badge {
-    font-family: var(--mono); font-size: 9px; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase; color: var(--acc);
-    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
-    padding: 3px 10px; border-radius: 3px;
-  }
-  .briefing-date { font-family:var(--mono); font-size:11px; color:var(--text2); }
-  .briefing-header-right { font-family:var(--mono); font-size:10px; color:var(--muted); }
-  .briefing-body {
-    padding: 20px;
+
+  .game-shell {
     display: grid;
-    grid-template-columns: 180px 1fr;
-    gap: 0 28px;
-    align-items: start;
+    grid-template-columns: minmax(260px, 320px) minmax(320px, 620px) minmax(260px, 320px);
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: 18px;
   }
-  @media(max-width:700px) { .briefing-body { grid-template-columns:1fr; } }
-  .score-block {
-    display: flex; flex-direction: column; align-items: center;
-    padding-right: 28px; border-right: 1px solid var(--border);
+
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    padding: 18px;
   }
-  @media(max-width:700px) { .score-block { border-right:none; border-bottom:1px solid var(--border); padding:0 0 16px; margin-bottom:16px; } }
-  .score-number {
-    font-family: var(--mono); font-size: 72px; font-weight: 700;
-    line-height: 1; letter-spacing: -3px;
+
+  h1, h2, p { margin: 0; }
+  h1 { font-size: clamp(1.7rem, 4vw, 3rem); line-height: 0.92; letter-spacing: -0.07em; }
+  h2 { color: var(--cyan); font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; }
+  .subtitle { color: var(--muted); margin-top: 12px; line-height: 1.55; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+  .stat { border: 1px solid rgba(255,255,255,0.09); border-radius: 15px; background: rgba(255,255,255,0.045); padding: 12px; }
+  .stat span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .stat strong { display: block; margin-top: 5px; font-size: 1.35rem; }
+
+  canvas {
+    width: min(92vw, 560px);
+    height: min(86vh, 820px);
+    max-height: 820px;
+    display: block;
+    border: 1px solid rgba(93, 231, 255, 0.34);
+    border-radius: 28px;
+    background: #050813;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.55), 0 0 40px rgba(93, 231, 255, 0.12) inset;
+    touch-action: none;
   }
-  .score-outof { font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:2px; }
-  .score-label {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    margin-top: 10px; text-align: center; letter-spacing: 0.04em; line-height: 1.4;
+
+  .bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 8px; }
+  .bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); border-radius: inherit; transition: width 0.18s; }
+  .controls { display: grid; gap: 10px; margin-top: 16px; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+  kbd { color: var(--text); border: 1px solid rgba(255,255,255,0.18); border-bottom-width: 3px; border-radius: 7px; padding: 2px 7px; background: rgba(255,255,255,0.08); }
+
+  .upgrade-list { display: grid; gap: 10px; margin-top: 14px; }
+  .upgrade { border-left: 3px solid var(--cyan); background: rgba(93, 231, 255, 0.07); border-radius: 12px; padding: 10px 12px; }
+  .upgrade strong { display: block; }
+  .upgrade small { color: var(--muted); }
+  button {
+    width: 100%; margin-top: 16px; border: 0; border-radius: 14px; padding: 13px 16px;
+    color: #06101b; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--cyan), var(--green)); cursor: pointer;
+    box-shadow: 0 12px 30px rgba(93, 231, 255, 0.22);
   }
-  .score-bar-wrap {
-    width: 100%; margin-top: 14px; height: 6px;
-    background: var(--surf2); border-radius: 3px; overflow:hidden; border: 1px solid var(--border);
+  button:hover { filter: brightness(1.06); }
+  .overlay {
+    position: fixed; inset: 0; display: grid; place-items: center; padding: 18px;
+    background: rgba(2, 5, 12, 0.72); backdrop-filter: blur(10px); z-index: 5;
   }
-  .score-bar-gradient { height:6px; width:100%; background:linear-gradient(90deg,#ff4d6d 0%,#ffb830 45%,#00e5a0 100%); }
-  .score-marker-row { position:relative; height:12px; width:100%; margin-top:3px; }
-  .score-marker-dot {
-    position:absolute; width:8px; height:8px; background:#ffb830;
-    border-radius:50%; top:0; box-shadow:0 0 8px #ffb830;
-  }
-  .score-range-labels {
-    display:flex; justify-content:space-between; width:100%;
-    font-family:var(--mono); font-size:8px; color:var(--muted); margin-top:4px;
-  }
-  .factors-block { display:flex; flex-direction:column; }
-  .factor-row {
-    display:flex; align-items:flex-start; gap:10px;
-    padding:8px 0; border-bottom:1px solid rgba(30,42,58,0.7);
-  }
-  .factor-row:last-child { border-bottom:none; }
-  .factor-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:3px; }
-  .factor-name {
-    font-family:var(--mono); font-size:10px; font-weight:600; color:var(--text2);
-    width:95px; flex-shrink:0; text-transform:uppercase; letter-spacing:0.06em; padding-top:1px;
-  }
-  .factor-detail { font-family:var(--mono); font-size:11px; color:var(--text); flex:1; line-height:1.5; }
-  .factor-value { font-weight:700; }
-  .briefing-summary {
-    margin-top: 16px; padding: 13px 16px;
-    background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.12);
-    border-radius: 5px; font-size: 13px; color: var(--text);
-    line-height: 1.7; grid-column: 1 / -1;
-  }
-  .briefing-summary strong {
-    color:var(--acc); font-family:var(--mono); font-size:9px;
-    letter-spacing:0.12em; text-transform:uppercase; display:block; margin-bottom:6px;
-  }
-  .briefing-disclaimer { font-size:10px; color:var(--muted); margin-top:8px; font-style:italic; }
-  /* ── END BRIEFING CARD ── */
-  /* ── PRE-MARKET MOVERS ── */
-  .mover-row { display:flex; align-items:center; gap:12px; padding:6px 6px; border-radius:3px; font-family:var(--mono); font-size:12px; }
-  .mover-row:nth-child(even) { background:var(--surf2); }
-  .mover-sym { width:60px; font-weight:700; flex-shrink:0; }
-  .mover-price { width:70px; flex-shrink:0; }
-  .mover-chg { font-weight:700; }
-  /* ── OPTIONS EXPIRY ── */
-  .opt-row { display:flex; gap:10px; align-items:baseline; padding:5px 6px; border-radius:3px; font-family:var(--mono); font-size:11px; }
-  .opt-row:nth-child(even) { background:var(--surf2); }
-  .opt-when { width:70px; flex-shrink:0; font-weight:600; }
-  .opt-date { width:100px; flex-shrink:0; }
-  .opt-kind { width:140px; flex-shrink:0; font-weight:600; }
-  .opt-note { flex:1; font-size:10px; line-height:1.4; }
-  /* ── CIRCUIT BREAKERS ── */
-  .cb-intro { font-size:12px; margin-bottom:14px; line-height:1.5; }
-  .cb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-  @media(max-width:700px) { .cb-grid { grid-template-columns:1fr; } }
-  .cb-card { background:var(--surf2); border:1px solid var(--border); border-radius:6px; padding:14px 16px; }
-  .cb-pct { font-family:var(--mono); font-size:22px; font-weight:700; line-height:1; }
-  .cb-price { font-family:var(--mono); font-size:18px; font-weight:600; margin-top:4px; }
-  .cb-action { font-family:var(--mono); font-size:11px; font-weight:600; margin-top:6px; color:var(--text2); text-transform:uppercase; letter-spacing:0.06em; }
-  .cb-desc { font-size:11px; margin-top:6px; line-height:1.4; }
-  /* ── FEEDBACK BOX ── */
-  .feedback-box {
-    background: var(--surf);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-    margin-top: 10px;
-  }
-  .feedback-title { font-family:var(--mono); font-size:16px; font-weight:700; color:var(--acc); margin-bottom:10px; }
-  .feedback-form { display:flex; flex-direction:column; gap:10px; }
-  .fb-row { display:flex; gap:10px; flex-wrap:wrap; }
-  .fb-input {
-    flex:1; min-width:160px;
-    background:var(--surf2); border:1px solid var(--border); border-radius:4px;
-    color:var(--text); font-family:var(--mono); font-size:12px;
-    padding:9px 12px; outline:none;
-    transition:border-color 0.2s;
-  }
-  .fb-input:focus { border-color:var(--acc); }
-  .fb-textarea {
-    background:var(--surf2); border:1px solid var(--border); border-radius:4px;
-    color:var(--text); font-family:var(--sans); font-size:13px;
-    padding:10px 12px; outline:none; resize:vertical;
-    transition:border-color 0.2s; line-height:1.5;
-  }
-  .fb-textarea:focus { border-color:var(--acc); }
-  .btn-feedback {
-    background:var(--acc); color:#050810;
-    font-family:var(--mono); font-size:12px; font-weight:700;
-    padding:10px 24px; border-radius:4px; border:none;
-    cursor:pointer; letter-spacing:0.05em;
-    transition:opacity 0.2s;
-  }
-  .btn-feedback:hover { opacity:0.85; }
-  /* ── END NEW SECTIONS ── */
-  .refresh-bar { background:var(--surf2); border:1px solid var(--border); border-radius:6px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding:8px 16px; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--text2); }
-  .refresh-bar span { color:var(--text); }
+  .modal { max-width: 560px; text-align: center; }
+  .choice-grid { display: grid; gap: 12px; margin-top: 18px; }
+  .choice { text-align: left; border: 1px solid rgba(93,231,255,0.3); border-radius: 16px; background: rgba(255,255,255,0.06); padding: 14px; cursor: pointer; }
+  .choice:hover { border-color: var(--green); background: rgba(96,255,168,0.09); }
+  .hidden { display: none; }
+  @media (max-width: 1040px) { .game-shell { grid-template-columns: 1fr; overflow-y: auto; align-items: start; } body { overflow: auto; } .panel { max-width: 560px; width: 100%; margin: 0 auto; } }
 </style>
 </head>
 <body>
-
-<div class="topbar">
-  <div class="logo">&#9670; SCOUT EYE <span>|</span> Daily Market Orientation</div>
-  <div class="topbar-right">
-    <span class="status-dot">&#9679;</span>
-    Updated: Thursday 26 February 2026 21:08 UTC &nbsp;|&nbsp; Last session &nbsp;|&nbsp;
-    <a href="https://twitter.com/PidwellRic60200" target="_blank" rel="noopener noreferrer" style="color:var(--text2);text-decoration:none">@PidwellRic60200</a>
-  </div>
-</div>
-
-<div class="main">
-
-  <div class="bench-bar">
-    <div class="bench-label-main">Market Benchmarks</div>
-    <div class="bench-cards"><div class="bench-card"><div class="bench-label">S&P 500</div><div class="bench-price" style="color:#00e5a0">$693.10</div><div class="bench-chg" style="color:#00e5a0">&#9650;+0.83% (Thu close)</div><svg width="120" height="32" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg" style="display:block"><polyline points="2.0,29.0 21.3,20.1 40.7,24.5 60.0,11.6 79.3,30.0 98.7,17.0 118.0,2.0" fill="none" stroke="#00e5a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="118.0" cy="2.0" r="2.5" fill="#00e5a0"/></svg></div><div class="bench-card"><div class="bench-label">NASDAQ 100</div><div class="bench-price" style="color:#00e5a0">$616.58</div><div class="bench-chg" style="color:#00e5a0">&#9650;+1.43% (Thu close)</div></div><div class="bench-card"><div class="bench-label">RUSSELL 2000</div><div class="bench-price" style="color:#00e5a0">$264.55</div><div class="bench-chg" style="color:#00e5a0">&#9660;+0.46% (Thu close)</div></div><div class="bench-card"><div class="bench-label">DOW JONES</div><div class="bench-price" style="color:#00e5a0">$494.95</div><div class="bench-chg" style="color:#00e5a0">&#9658;+0.00% (Thu close)</div></div><div class="bench-card"><div class="bench-label">VIX FEAR</div><div class="bench-price" style="color:#00e5a0">18.68</div><div class="bench-chg" style="color:#00e5a0">CALM (Thu close)</div></div></div>
-  </div>
-
-  
-  <div class="bench-bar" style="margin-top:6px">
-    <div class="bench-label-main" style="flex-direction:column;align-items:flex-start;gap:2px">
-      <span>Futures</span>
-      <span style="font-size:8px;color:var(--muted);font-weight:400;letter-spacing:0">Yahoo &middot; 24/7</span>
-    </div>
-    <div class="bench-cards"><div class="bench-card"><div class="bench-label">S&P 500 Futures</div><div class="bench-price" style="color:#00e5a0">$6,917.75</div><div class="bench-chg" style="color:#00e5a0">&#9650; +0.97%</div></div><div class="bench-card"><div class="bench-label">Nasdaq Futures</div><div class="bench-price" style="color:#00e5a0">$25,068.75</div><div class="bench-chg" style="color:#00e5a0">&#9650; +1.24%</div></div><div class="bench-card"><div class="bench-label">Dow Futures</div><div class="bench-price" style="color:#00e5a0">$49,530.00</div><div class="bench-chg" style="color:#00e5a0">&#9650; +1.39%</div></div><div class="bench-card"><div class="bench-label">Russell Futures</div><div class="bench-price" style="color:#00e5a0">$2,681.10</div><div class="bench-chg" style="color:#00e5a0">&#9650; +2.09%</div></div><div class="bench-card"><div class="bench-label">Crude Oil</div><div class="bench-price" style="color:#ff4d6d">65.47</div><div class="bench-chg" style="color:#ff4d6d">&#9660; -1.27%</div></div><div class="bench-card"><div class="bench-label">Gold</div><div class="bench-price" style="color:#00e5a0">$5,210.90</div><div class="bench-chg" style="color:#00e5a0">&#9650; +0.12%</div></div><div class="bench-card"><div class="bench-label">10Y Treasury</div><div class="bench-price" style="color:#ffb830">$113.39</div><div class="bench-chg" style="color:#ffb830">&#9658; +0.01%</div></div></div>
-  </div>
-
-  
-  <div class="section-title">Pre-Market Briefing</div>
-  <div class="briefing-card">
-    <div class="briefing-header">
-      <div class="briefing-header-left">
-        <span class="briefing-badge">&#9670; Pre-Market Briefing</span>
-        <span class="briefing-date">Thursday 26 February 2026 &mdash; Before the open</span>
+  <main class="game-shell">
+    <section class="panel">
+      <h2>Endless arcade shooter</h2>
+      <h1>Starfall Sentinel</h1>
+      <p class="subtitle">Move, auto-fire upward, collect energy, level up, pick upgrades, and survive increasingly brutal waves and bosses.</p>
+      <div class="stat-grid">
+        <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+        <div class="stat"><span>Wave</span><strong id="wave">1</strong></div>
+        <div class="stat"><span>Level</span><strong id="level">1</strong></div>
+        <div class="stat"><span>Best</span><strong id="best">0</strong></div>
       </div>
-      <div class="briefing-header-right">Data updates every 2 minutes &middot; descriptive only</div>
-    </div>
-    <div class="briefing-body">
-      <div class="score-block">
-        <div class="score-number" style="color:#ffb830">59</div>
-        <div class="score-outof">out of 100</div>
-        <div class="score-label" style="color:#ffb830">NEUTRAL</div>
-        <div class="score-bar-wrap"><div class="score-bar-gradient"></div></div>
-        <div class="score-marker-row">
-          <div class="score-marker-dot" style="left:calc(59% - 4px);background:#ffb830;box-shadow:0 0 8px #ffb830"></div>
-        </div>
-        <div class="score-range-labels">
-          <span>Hostile</span><span>Caution</span><span>Neutral</span><span>Good</span>
-        </div>
+      <div class="controls">
+        <p><kbd>A</kbd>/<kbd>D</kbd> or <kbd>←</kbd>/<kbd>→</kbd> to move. Drag or move the mouse on desktop/mobile.</p>
+        <p><kbd>P</kbd> pauses. Shooting is automatic. Grab green orbs to level up.</p>
       </div>
-      <div class="factors-block">
-        <div class="factor-row"><div class="factor-dot" style="background:#ffb830"></div><div class="factor-name">Volatility</div><div class="factor-detail"><span class="factor-value" style="color:#ffb830">Normal</span> &mdash; VIX 18.7 — normal range. Some caution warranted.</div></div><div class="factor-row"><div class="factor-dot" style="background:#ff4d6d"></div><div class="factor-name">Macro Risk</div><div class="factor-detail"><span class="factor-value" style="color:#ff4d6d">Caution</span> &mdash; PPI Report in 1 day — markets may pre-position.</div></div><div class="factor-row"><div class="factor-dot" style="background:#00e5a0"></div><div class="factor-name">Momentum</div><div class="factor-detail"><span class="factor-value" style="color:#00e5a0">Positive</span> &mdash; SPY closed +0.83% last session — mild upward momentum.</div></div><div class="factor-row"><div class="factor-dot" style="background:#4a5a6e"></div><div class="factor-name">Sectors</div><div class="factor-detail"><span class="factor-value" style="color:#4a5a6e">Unknown</span> &mdash; Sector data unavailable (markets closed).</div></div><div class="factor-row"><div class="factor-dot" style="background:#00e5a0"></div><div class="factor-name">Sentiment</div><div class="factor-detail"><span class="factor-value" style="color:#00e5a0">Greed</span> &mdash; Sentiment score 61/100 — greed. Healthy bullish backdrop.</div></div>
-      </div>
-      <div class="briefing-summary">
-        <strong>In Plain English</strong>
-        Volatility is normal — normal range. some caution warranted. Macro calendar: markets may pre-position. Sector picture: sector data unavailable (markets closed).
-        <div class="briefing-disclaimer">Market conditions summary only &mdash; not investment advice. Score is algorithmic and descriptive only.</div>
-      </div>
-    </div>
+    </section>
+
+    <canvas id="game" width="560" height="820" aria-label="Starfall Sentinel game canvas"></canvas>
+
+    <aside class="panel">
+      <h2>Pilot systems</h2>
+      <div class="stat" style="margin-top:14px"><span>Hull</span><div class="bar"><i id="hpBar"></i></div></div>
+      <div class="stat" style="margin-top:10px"><span>XP</span><div class="bar"><i id="xpBar"></i></div></div>
+      <div class="upgrade-list" id="upgrades"></div>
+      <button id="restart">Restart run</button>
+    </aside>
+  </main>
+
+  <div class="overlay" id="startOverlay">
+    <section class="panel modal">
+      <h2>No ads. No clutter. Just the run.</h2>
+      <h1>Hold the line.</h1>
+      <p class="subtitle">Enemies rush downward while your cannon fires constantly. Every level offers three random upgrades so each run builds differently.</p>
+      <button id="startBtn">Start game</button>
+    </section>
   </div>
 
-  <div class="grid-hero">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Market Sentiment</span><span class="card-meta">Own composite &middot; not CNN</span></div>
-      <div class="card-body">
-        <div class="fg-gauge-wrap">
-          <div style="flex-shrink:0"><svg width="240" height="148" viewBox="0 0 240 148" style="display:block"><path d="M 63.4 58.4 A 80 80 0 1 1 63.4 171.6" fill="none" stroke="#1e2a3a" stroke-width="16" stroke-linecap="round"/><path d="M 63.4 58.4 A 80 80 0 0 1 132.5 36.0" fill="none" stroke="#cc2200" stroke-width="16" stroke-linecap="butt" opacity="0.75"/><path d="M 132.5 36.0 A 80 80 0 0 1 191.3 78.7" fill="none" stroke="#e06600" stroke-width="16" stroke-linecap="butt" opacity="0.75"/><path d="M 191.3 78.7 A 80 80 0 0 1 191.3 151.3" fill="none" stroke="#888800" stroke-width="16" stroke-linecap="butt" opacity="0.75"/><path d="M 191.3 151.3 A 80 80 0 0 1 132.5 194.0" fill="none" stroke="#448800" stroke-width="16" stroke-linecap="butt" opacity="0.75"/><path d="M 132.5 194.0 A 80 80 0 0 1 63.4 171.6" fill="none" stroke="#00aa44" stroke-width="16" stroke-linecap="butt" opacity="0.75"/><line x1="120" y1="115" x2="179.1" y2="148.7" stroke="#80e060" stroke-width="2.5" stroke-linecap="round"/><circle cx="120" cy="115" r="5" fill="#80e060"/><text x="120" y="143" text-anchor="middle" fill="#80e060" font-size="26" font-weight="700" font-family="JetBrains Mono,monospace">61</text><text x="120" y="157" text-anchor="middle" fill="#4a5a6e" font-size="8" font-family="JetBrains Mono,monospace" letter-spacing="1">OUT OF 100</text></svg></div>
-          <div>
-            <div class="fg-lbl" style="color:#80e060;margin-bottom:4px">Greed (Thu close)</div>
-            <div class="muted small" style="margin-bottom:10px">Score 0&ndash;100 &middot; 0=Extreme Fear &middot; 100=Extreme Greed</div>
-            <div class="fg-gauge-labels">
-              <div class="fg-zone-row"><div class="fg-zone-dot" style="background:#00aa44"></div><div class="fg-zone-lbl">EXTREME GREED (75&ndash;100)</div></div>
-              <div class="fg-zone-row"><div class="fg-zone-dot" style="background:#448800"></div><div class="fg-zone-lbl">GREED (60&ndash;74)</div></div>
-              <div class="fg-zone-row"><div class="fg-zone-dot" style="background:#888800"></div><div class="fg-zone-lbl">NEUTRAL (45&ndash;59)</div></div>
-              <div class="fg-zone-row"><div class="fg-zone-dot" style="background:#e06600"></div><div class="fg-zone-lbl">FEAR (30&ndash;44)</div></div>
-              <div class="fg-zone-row"><div class="fg-zone-dot" style="background:#cc2200"></div><div class="fg-zone-lbl">EXTREME FEAR (0&ndash;29)</div></div>
-            </div>
-          </div>
-        </div>
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div class="signal-row"><span class="signal-name">VIX Level</span><div class="signal-bar-wrap"><div class="signal-bar" style="width:55%;background:#ffb830"></div></div><span class="signal-val" style="color:#ffb830">55</span></div><div class="signal-row"><span class="signal-name">S&P Momentum</span><div class="signal-bar-wrap"><div class="signal-bar" style="width:65%;background:#00e5a0"></div></div><span class="signal-val" style="color:#00e5a0">65</span></div><div class="signal-row"><span class="signal-name">Market Breadth</span><div class="signal-bar-wrap"><div class="signal-bar" style="width:45%;background:#ffb830"></div></div><span class="signal-val" style="color:#ffb830">45</span></div><div class="signal-row"><span class="signal-name">Tech Leadership</span><div class="signal-bar-wrap"><div class="signal-bar" style="width:80%;background:#00e5a0"></div></div><span class="signal-val" style="color:#00e5a0">80</span></div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">S&amp;P 500 &middot; Daily Snapshot</span><span class="card-meta">SPY ETF &middot; Alpaca/IEX</span></div>
-      <div class="card-body"><div class="spy-big" style="color:#00e5a0">$693.10</div><div class="spy-chg" style="color:#00e5a0">&#9650; +0.83% (Thu close)</div><div class="spy-trend muted">Last recorded session</div><div style="margin-top:8px"><svg width="160" height="36" viewBox="0 0 160 36" xmlns="http://www.w3.org/2000/svg" style="display:block"><polyline points="2.0,32.9 28.0,22.6 54.0,27.7 80.0,12.9 106.0,34.0 132.0,19.1 158.0,2.0" fill="none" stroke="#00e5a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="158.0" cy="2.0" r="2.5" fill="#00e5a0"/></svg></div></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">VIX &middot; Fear Gauge</span><span class="card-meta">CBOE Volatility Index</span></div>
-      <div class="card-body"><div class="vix-big" style="color:#00e5a0">18.7</div><div class="vix-lbl" style="color:#00e5a0">CALM (Thu close)</div></div>
-    </div>
+  <div class="overlay hidden" id="upgradeOverlay">
+    <section class="panel modal">
+      <h2>Level up</h2>
+      <h1>Choose an upgrade</h1>
+      <div class="choice-grid" id="choices"></div>
+    </section>
   </div>
 
-  <div class="section-title">Daily Market Orientation</div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Market Context Summary</span><span class="card-meta">Descriptive only &middot; not advice</span></div>
-    <div class="card-body">
-    <div class="orientation-grid">
-      <div class="ori-item">
-        <div class="ori-label">Volatility Regime</div>
-        <div class="ori-val" style="color:#ffb830">Normal</div>
-        <div class="ori-sub muted">VIX 18.7</div>
-      </div>
-      <div class="ori-item">
-        <div class="ori-label">Market Breadth</div>
-        <div class="ori-val" style="color:#ff4d6d">Narrow</div>
-        <div class="ori-sub muted">IWM vs SPY</div>
-      </div>
-      <div class="ori-item">
-        <div class="ori-label">Leadership</div>
-        <div class="ori-val" style="color:#00d4ff">Growth (tech leading)</div>
-        <div class="ori-sub muted">QQQ vs SPY</div>
-      </div>
-      <div class="ori-item">
-        <div class="ori-label">Next Catalyst</div>
-        <div class="ori-val-sm"><span style="color:#00d4ff">PPI Report &mdash; Tomorrow (2026-02-27)</span></div>
-        <div class="ori-sub muted">Scheduled macro release</div>
-      </div>
-    </div>
-    <p class="ori-disclaimer">This summary is purely descriptive. It describes observable market conditions only and does not constitute investment advice or a recommendation to buy, sell, or hold any security.</p>
-    </div>
-  </div>
-
-  <div class="section-title">Economic Calendar &middot; This Week</div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Scheduled Macro Releases</span><span class="card-meta">FOMC &middot; CPI &middot; NFP &middot; GDP &middot; High impact USD events</span></div>
-    <div class="card-body">
-      <div class="week-grid"><div class="week-day" style="border-right:1px solid var(--border);"><div class="week-day-header"><div class="week-day-name" style="color:var(--text)">MON</div><div class="week-day-date muted">23 Feb</div></div><div class="week-ev-empty muted">—</div></div><div class="week-day" style="border-right:1px solid var(--border);"><div class="week-day-header"><div class="week-day-name" style="color:var(--text)">TUE</div><div class="week-day-date muted">24 Feb</div></div><div class="week-ev-empty muted">—</div></div><div class="week-day" style="border-right:1px solid var(--border);"><div class="week-day-header"><div class="week-day-name" style="color:var(--text)">WED</div><div class="week-day-date muted">25 Feb</div></div><div class="week-ev-empty muted">—</div></div><div class="week-day" style="border-right:1px solid var(--border);"><div class="week-day-header"><div class="week-day-name" style="color:var(--acc)">THU</div><div class="week-day-date muted">26 Feb</div></div><div class="week-ev-empty muted">—</div></div><div class="week-day" style=""><div class="week-day-header"><div class="week-day-name" style="color:var(--text)">FRI</div><div class="week-day-date muted">27 Feb</div></div><div class="week-ev"><div class="week-ev-name" style="color:#00d4ff">PPI Report</div><div class="week-ev-bar" style="background:#00d4ff"></div></div></div></div><div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)"><div class="muted" style="font-size:10px;letter-spacing:0.1em;margin-bottom:6px">UPCOMING</div><div class="cal-row"><span class="cal-when" style="color:#ffb830">in 8d</span><span class="cal-date muted">2026-03-06</span><span class="cal-event" style="color:#ffb830">NFP Jobs Report</span><span class="cal-desc muted">Non-Farm Payrolls</span></div><div class="cal-row"><span class="cal-when" style="color:#00d4ff">in 13d</span><span class="cal-date muted">2026-03-11</span><span class="cal-event" style="color:#00d4ff">CPI Report</span><span class="cal-desc muted">Consumer Price Index</span></div></div>
-    </div>
-  </div>
-
-  <!-- NEWS — JS paginated, newest first, full headlines -->
-  <div class="section-title">Top Stories &middot; Last 48h &middot; Newest First</div>
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">News Headlines</span>
-      <span class="card-meta" id="news-source-meta">100 stories collected</span>
-    </div>
-    <div class="card-body">
-      <div class="news-header">
-        <span style="width:20px">&nbsp;</span>
-        <span style="width:56px">Age</span>
-        <span style="width:90px">Source</span>
-        <span>Headline</span>
-      </div>
-      <div id="news-container">
-        
-      </div>
-      <div class="news-pagination" id="news-pagination" style="">
-        <span class="news-page-info" id="news-page-info"></span>
-        <div class="news-page-btns">
-          <button class="page-btn" id="news-prev" onclick="newsPage(-1)">&#8592; Prev</button>
-          <button class="page-btn" id="news-next" onclick="newsPage(1)">Next &#8594;</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EARNINGS -->
-  <div class="section-title">Earnings Radar &middot; Next 7 Days</div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Upcoming Earnings</span><span class="card-meta">Source: Hunter pipeline</span></div>
-    <div class="card-body">
-      <div class="earn-header">
-        <span style="width:20px">&nbsp;</span>
-        <span style="width:56px">Age</span>
-        <span style="width:52px">Sym</span>
-        <span style="width:90px">Source</span>
-        <span>Headline</span>
-      </div>
-      <div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">AI</span><span class="earn-src muted">Yahoo Finance</span><span class="earn-hl">AI Stocks Hit Reset. Will Nvidia, Snowflake, CoreWeave, Salesforce Earnings Decide What's Next?</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-src muted">CNBC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">DPM</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">DPM Metals Inc. (DPM:CA) Presents at 35th BMO Global Metals, Mining & Critical Minerals Conference - Slideshow</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-src muted">CNBC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">GSK</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">GSK to acquire Canada's 35Pharma for $950M in cash</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">FPA</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">FPA Source Capital Q4 2025 Commentary</span></div><div class="earn-row"><span class="earn-arrow" style="color:#00e5a0">&#9650;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">PPL</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">PPL Corporation: Limited By Lackluster Dividend Growth</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">HP</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">HP Inc. 2026 Q1 - Results - Earnings Call Presentation</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">VEEM</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">VEEM Ltd (VEEMF) Q2 2026 Earnings Call Transcript</span></div><div class="earn-row"><span class="earn-arrow" style="color:#00e5a0">&#9650;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">HSBC</span><span class="earn-src muted">Market Data</span><span class="earn-hl">HSBC lifts earnings target, annual profit dips but beats estimates</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-src muted">CNBC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div><div class="earn-row"><span class="earn-arrow" style="color:#00e5a0">&#9650;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">TJ</span><span class="earn-src muted">MarketWatch</span><span class="earn-hl">TJ Maxx parent’s earnings show discount clothes and home goods are still in high demand</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ff4d6d">&#9660;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">IBM</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">IBM awarded $112M contract by Defense Commissary Agency to modernize electronic shelf label system</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">SES</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">SES AI: Scaling Its Way To The Top Spot</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">NKT</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">NKT A/S 2025 Q4 - Results - Earnings Call Presentation</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-src muted">CNBC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div><div class="earn-row"><span class="earn-arrow" style="color:#00e5a0">&#9650;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">TJ</span><span class="earn-src muted">MarketWatch</span><span class="earn-hl">TJ Maxx parent’s earnings show discount clothes and home goods are still in high demand</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">SEB</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">SEB SA (SEBYY) Q4 2025 Earnings Call Transcript</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">AECI</span><span class="earn-src muted">Seeking Alpha</span><span class="earn-hl">AECI Ltd (AECLY) Q4 2025 Earnings Call Transcript</span></div><div class="earn-row"><span class="earn-arrow" style="color:#ffb830">&#9658;</span><span class="earn-age muted">1d ago</span><span class="earn-sym" style="color:#00d4ff">CFTC</span><span class="earn-src muted">CNBC</span><span class="earn-hl">CFTC defends its right to prediction market enforcement as states challenge platforms</span></div>
-    </div>
-  </div>
-
-  <div class="section-title">Sector Pulse &middot; Today vs Yesterday</div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">S&amp;P 500 Sector ETFs</span><span class="card-meta">XLK XLF XLE XLV XLI XLP XLY XLU &middot; Alpaca/IEX</span></div>
-    <div class="card-body"><p class="muted">Sector data activates Mon–Fri during US market hours.</p></div>
-  </div>
-
-  <div class="section-title">Currency Pairs &middot; FX Rates</div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">GBP/USD &middot; EUR/USD &middot; USD/JPY</span><span class="card-meta">Yahoo Finance &middot; relevant for UK investors</span></div>
-    <div class="card-body"><div class="fx-grid"><div class="fx-card"><div class="fx-note muted">Pound vs Dollar</div><div class="fx-label">GBP/USD</div><div class="fx-price" style="color:#00e5a0">1.3491</div><div class="fx-chg" style="color:#00e5a0">&#9650; +0.22%</div></div><div class="fx-card"><div class="fx-note muted">Euro vs Dollar</div><div class="fx-label">EUR/USD</div><div class="fx-price" style="color:#00e5a0">1.1805</div><div class="fx-chg" style="color:#00e5a0">&#9650; +0.31%</div></div><div class="fx-card"><div class="fx-note muted">Dollar vs Yen</div><div class="fx-label">USD/JPY</div><div class="fx-price" style="color:#00e5a0">156.13</div><div class="fx-chg" style="color:#00e5a0">&#9650; +0.62%</div></div></div><p class="muted small" style="margin-top:8px">Yahoo Finance · relevant for UK investors holding US stocks</p></div>
-  </div>
-
-  <!-- PRE-MARKET MOVERS -->
-  <div class="section-title">Notable Movers &middot; Last Session</div>
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">Stocks That Moved 2%+</span>
-      <span class="card-meta">Major liquid stocks &middot; Alpaca/IEX</span>
-    </div>
-    <div class="card-body"><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">NVDA</span><span class="mover-price muted">$184.86</span><span class="mover-chg" style="color:#ff4d6d">&#9660; -5.60%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">AMD</span><span class="mover-price muted">$203.71</span><span class="mover-chg" style="color:#ff4d6d">&#9660; -3.41%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">INTC</span><span class="mover-price muted">$45.47</span><span class="mover-chg" style="color:#ff4d6d">&#9660; -3.05%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">LCID</span><span class="mover-price muted">$10.58</span><span class="mover-chg" style="color:#00e5a0">&#9650; +2.92%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">UBER</span><span class="mover-price muted">$74.80</span><span class="mover-chg" style="color:#00e5a0">&#9650; +2.72%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">AMC</span><span class="mover-price muted">$1.14</span><span class="mover-chg" style="color:#ff4d6d">&#9660; -2.58%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">RIVN</span><span class="mover-price muted">$15.62</span><span class="mover-chg" style="color:#00e5a0">&#9650; +2.33%</span></div><div class="mover-row"><span class="mover-sym" style="color:#00d4ff">NFLX</span><span class="mover-price muted">$84.62</span><span class="mover-chg" style="color:#00e5a0">&#9650; +2.32%</span></div></div>
-  </div>
-
-  <!-- OPTIONS EXPIRY -->
-  <div class="section-title">Options Expiry Calendar &middot; Next 8 Weeks</div>
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">Upcoming Expiry Dates</span>
-      <span class="card-meta">
-        <span style="color:#ff4d6d">&#9632;</span> Triple Witching &nbsp;
-        <span style="color:#ffb830">&#9632;</span> Monthly &nbsp;
-        <span style="color:#4a5a6e">&#9632;</span> Weekly
-      </span>
-    </div>
-    <div class="card-body"><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">Tomorrow</span><span class="opt-date muted">2026-02-27</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">in 8d</span><span class="opt-date muted">2026-03-06</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">in 15d</span><span class="opt-date muted">2026-03-13</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#ff4d6d">in 22d</span><span class="opt-date muted">2026-03-20</span><span class="opt-kind" style="color:#ff4d6d">Triple Witching</span><span class="opt-note muted">Quarterly — highest volatility expiry. Stocks, ETFs, index options & futures all expire.</span></div><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">in 29d</span><span class="opt-date muted">2026-03-27</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">in 36d</span><span class="opt-date muted">2026-04-03</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#4a5a6e">in 43d</span><span class="opt-date muted">2026-04-10</span><span class="opt-kind" style="color:#4a5a6e">Weekly Expiry</span><span class="opt-note muted">Weekly options expiry — minor effect on most stocks.</span></div><div class="opt-row"><span class="opt-when" style="color:#ffb830">in 50d</span><span class="opt-date muted">2026-04-17</span><span class="opt-kind" style="color:#ffb830">Monthly Expiry</span><span class="opt-note muted">Monthly options expiry — increased volatility expected, especially in final hour.</span></div></div>
-  </div>
-
-  <!-- CIRCUIT BREAKERS -->
-  <div class="section-title">Circuit Breaker Levels &middot; Today</div>
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">SEC Rule 80B &middot; Market Halt Levels</span>
-      <span class="card-meta">Resets daily from prior close &middot; SPY-based</span>
-    </div>
-    <div class="card-body">
-        <div class="cb-intro muted">Based on SPY last close of <span style="color:var(--text)">$693.10</span> &mdash; levels where the SEC halts or closes the entire US market.</div>
-        <div class="cb-grid">
-          <div class="cb-card">
-            <div class="cb-pct" style="color:#ffb830">&#9660; 7%</div>
-            <div class="cb-price" style="color:#ffb830">$644.58</div>
-            <div class="cb-action">15-min halt</div>
-            <div class="cb-desc muted">Trading pauses 15 min if hit before 3:25pm ET</div>
-          </div>
-          <div class="cb-card">
-            <div class="cb-pct" style="color:#ffb830">&#9660; 13%</div>
-            <div class="cb-price" style="color:#ffb830">$603.00</div>
-            <div class="cb-action">15-min halt</div>
-            <div class="cb-desc muted">Second 15-min halt if decline continues</div>
-          </div>
-          <div class="cb-card">
-            <div class="cb-pct" style="color:#ff4d6d">&#9660; 20%</div>
-            <div class="cb-price" style="color:#ff4d6d">$554.48</div>
-            <div class="cb-action" style="color:#ff4d6d">Market closes</div>
-            <div class="cb-desc muted">Market closes for remainder of day. No exceptions.</div>
-          </div>
-        </div>
-        <p class="muted small" style="margin-top:10px">SEC Rule 80B &middot; Levels reset each morning from prior day close &middot; Not investment advice</p></div>
-  </div>
-
-  <div class="refresh-bar">
-    <div>Page generated: <span>Thursday 26 February 2026 21:08 UTC</span></div>
-    <div>Data session: <span>Last session</span></div>
-    <div>News source: <span>Public RSS feeds</span></div>
-    <div>Price source: <span>Alpaca IEX (live) &middot; Yahoo Finance futures &middot; CSV overnight</span></div>
-  </div>
-
-  <div class="section-title">Help Shape Scout Eye</div>
-  
-    <div class="feedback-box">
-      <div class="feedback-title">&#9993; Suggestions &amp; Feedback</div>
-      <p class="muted" style="margin-bottom:16px;font-size:13px">What would you like to see on Scout Eye? A question, a feature request, or anything at all — it goes straight to the team. No account needed.</p>
-      <form action="https://formspree.io/f/xzdakpqe" method="POST" class="feedback-form" onsubmit="handleFeedbackSubmit(event)">
-        <input type="hidden" name="_subject" value="Scout Eye Feedback">
-        <div class="fb-row">
-          <input type="text" name="name" placeholder="Your name (optional)" class="fb-input" autocomplete="off">
-          <input type="email" name="email" placeholder="Your email (optional — only if you want a reply)" class="fb-input" autocomplete="off">
-        </div>
-        <textarea name="message" placeholder="What would you like to see? Any questions or suggestions..." class="fb-textarea" rows="4" required></textarea>
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <button type="submit" class="btn-feedback">Send &rarr;</button>
-          <span id="fb-confirm" style="display:none;color:var(--green);font-family:var(--mono);font-size:12px">&#10003; Sent — thank you!</span>
-        </div>
-      </form>
-    </div>
-  
-    <div class="survey-box">
-      <div class="survey-title">Would you pay for daily access to this?</div>
-      <p class="survey-sub">Scout Eye is currently free to test. Help shape what it becomes — takes 30 seconds.</p>
-      <div class="price-grid">
-        <div class="price-opt"><div class="price-amt">Free</div><div class="price-lbl">Always free</div></div>
-        <div class="price-opt"><div class="price-amt">&pound;3&ndash;5</div><div class="price-lbl">per month</div></div>
-        <div class="price-opt"><div class="price-amt">&pound;5&ndash;10</div><div class="price-lbl">per month</div></div>
-        <div class="price-opt"><div class="price-amt">&pound;10&ndash;15</div><div class="price-lbl">per month</div></div>
-        <div class="price-opt"><div class="price-amt">&pound;15+</div><div class="price-lbl">per month</div></div>
-      </div>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdEVq7JGKWBng-gQdp2oIhVOISlkr53fX-3ld2UHA8t8F2bAA/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="btn-survey">Take the 30-second survey &rarr;</a>
-      <p class="muted small" style="margin-top:12px">No email required. Completely anonymous.</p>
-    </div>
-  
-    <div class="donate-box">
-      <div class="donate-title">&#9749; Support Scout Eye</div>
-      <p class="muted">If this saves you time in your morning routine, consider making a small donation via PayPal. Entirely optional &mdash; the dashboard stays free during the trial period.</p>
-      <a href="https://paypal.me/Pidwell" target="_blank" rel="noopener noreferrer" class="btn-coffee">&#9829;&nbsp; Donate via PayPal</a>
-    </div>
-
-</div>
-
-<div class="footer">
-  <strong>NOT INVESTMENT ADVICE</strong> &mdash; This page is for informational and orientation purposes only. Nothing on this page constitutes financial, investment, or trading advice of any kind. No buy, sell, or hold signals are provided or implied.<br>
-  <strong>NOT A LIVE FEED</strong> &mdash; Data is generated periodically and may lag real-time market prices. Do not rely on this for time-sensitive trading decisions.<br>
-  <strong>DATA ACCURACY</strong> &mdash; Benchmark prices from overnight CSV data (Alpaca IEX during market hours). Futures from Yahoo Finance &mdash; indicative only. News from public RSS feeds. Accuracy is not guaranteed.<br>
-  <strong>DIRECTIONAL ARROWS</strong> &mdash; Up/down arrows on news stories are generated by simple keyword matching only. They are not financial analysis and should not be relied upon.<br>
-  <strong>MARKET SENTIMENT COMPOSITE</strong> &mdash; An independent original composite metric. Not affiliated with, endorsed by, or derived from CNN's Fear &amp; Greed Index. Not predictive of future market performance.<br>
-  <strong>NO LIABILITY</strong> &mdash; The creator accepts no responsibility for any financial losses arising from use of this information.<br>
-  <strong>CIRCUIT BREAKER LEVELS</strong> &mdash; Calculated from prior day SPY close for indicative purposes only. Always verify with your broker. Not investment advice.<br>
-  <strong>OPTIONS EXPIRY DATES</strong> &mdash; Calculated algorithmically. Always verify with your broker or the OCC (optionsclearing.com). Options expiry can affect stock volatility but is not a trading signal.<br>
-  <strong>NOTABLE MOVERS</strong> &mdash; Based on prior session close prices from a fixed watchlist of liquid stocks only. Not a comprehensive screener. Not investment advice.<br>
-  <strong>ECONOMIC CALENDAR</strong> &mdash; Dates are approximate. Always verify with official government sources (BLS, BEA, Federal Reserve).<br>
-  &copy; 2026 Scout Eye &middot;
-  <a href="https://twitter.com/PidwellRic60200" target="_blank" rel="noopener noreferrer" style="color:#3a3a5a">@PidwellRic60200</a>
-</div>
-
-<!-- FEEDBACK FORM SCRIPT -->
 <script>
-  function handleFeedbackSubmit(e) {
-    e.preventDefault();
-    var form = e.target;
-    var data = new FormData(form);
-    fetch(form.action, {
-      method: 'POST',
-      body: data,
-      headers: { 'Accept': 'application/json' }
-    }).then(function(r) {
-      if (r.ok) {
-        form.reset();
-        document.getElementById('fb-confirm').style.display = 'inline';
-        setTimeout(function() {
-          document.getElementById('fb-confirm').style.display = 'none';
-        }, 5000);
-      }
-    }).catch(function() {});
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const ui = Object.fromEntries(['score','wave','level','best','hpBar','xpBar','upgrades','choices','startOverlay','upgradeOverlay'].map(id => [id, document.getElementById(id)]));
+  const keys = new Set();
+  const bestKey = 'starfall-sentinel-best';
+  let best = Number(localStorage.getItem(bestKey) || 0);
+  let running = false, paused = false, last = 0, spawnTimer = 0, shotTimer = 0, bossTimer = 28;
+  let bullets = [], enemies = [], particles = [], orbs = [], stars = [];
+
+  const player = { x: 280, y: 735, r: 18, hp: 100, maxHp: 100, level: 1, xp: 0, nextXp: 24, score: 0, wave: 1, speed: 440, fireRate: 0.18, damage: 18, bulletSpeed: 720, spread: 1, pierce: 0, magnet: 95, regen: 0 };
+  const upgradeDefs = [
+    ['Twin Cannons', 'Add another projectile to each volley.', p => p.spread = Math.min(5, p.spread + 1)],
+    ['Overclock', 'Fire 18% faster.', p => p.fireRate *= 0.82],
+    ['Plasma Rounds', 'Increase bullet damage by 25%.', p => p.damage *= 1.25],
+    ['Rail Accelerant', 'Bullets travel faster and pierce one more target.', p => { p.bulletSpeed += 90; p.pierce += 1; }],
+    ['Thrusters', 'Move 18% faster.', p => p.speed *= 1.18],
+    ['Repair Drones', 'Restore hull and improve max hull.', p => { p.maxHp += 18; p.hp = Math.min(p.maxHp, p.hp + 45); }],
+    ['XP Magnet', 'Pull energy orbs from farther away.', p => p.magnet += 55],
+    ['Nano Regen', 'Slowly repair hull during combat.', p => p.regen += 1.4]
+  ];
+
+  function reset() {
+    Object.assign(player, { x: 280, y: 735, r: 18, hp: 100, maxHp: 100, level: 1, xp: 0, nextXp: 24, score: 0, wave: 1, speed: 440, fireRate: 0.18, damage: 18, bulletSpeed: 720, spread: 1, pierce: 0, magnet: 95, regen: 0 });
+    bullets = []; enemies = []; particles = []; orbs = []; stars = Array.from({length: 90}, () => ({x: Math.random()*560, y: Math.random()*820, s: Math.random()*2+0.4, v: Math.random()*65+25}));
+    running = true; paused = false; last = performance.now(); spawnTimer = 0; shotTimer = 0; bossTimer = 28; ui.startOverlay.classList.add('hidden'); ui.upgradeOverlay.classList.add('hidden'); requestAnimationFrame(loop);
   }
-</script>
 
-<!-- SILENT AUTO-REFRESH SCRIPT -->
-<!-- Fetches version.json every 2 minutes. If the build timestamp is newer
-     than when this page loaded, reloads silently. Does nothing if unchanged.
-     Uses GitHub Pages URL (not raw.githubusercontent.com) to avoid CDN caching. -->
-<script>
-  (function() {
-    var CHECK_INTERVAL = 2 * 60 * 1000;  // 2 minutes
-    // Use GitHub Pages URL — avoids raw.githubusercontent.com CDN cache delays
-    var VERSION_URL    = 'https://piddypids.github.io/Scouteye/version.json';
-    var loadedAt       = null;
-
-    function fetchVersion(callback) {
-      var xhr = new XMLHttpRequest();
-      // Cache buster ensures browser never serves a stale cached copy
-      xhr.open('GET', VERSION_URL + '?nocache=' + Date.now(), true);
-      xhr.setRequestHeader('Cache-Control', 'no-cache, no-store');
-      xhr.setRequestHeader('Pragma', 'no-cache');
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState !== 4) return;
-        if (xhr.status !== 200) return;
-        try {
-          var data = JSON.parse(xhr.responseText);
-          callback(data.built_at || null);
-        } catch(e) { /* malformed — ignore */ }
-      };
-      xhr.send();
+  function shoot() {
+    const count = player.spread;
+    for (let i = 0; i < count; i++) {
+      const offset = (i - (count - 1) / 2) * 10;
+      const angle = (i - (count - 1) / 2) * 0.08;
+      bullets.push({ x: player.x + offset, y: player.y - 18, vx: Math.sin(angle) * 150, vy: -player.bulletSpeed, r: 4, damage: player.damage, pierce: player.pierce });
     }
+  }
 
-    // Record the version this page was built with on first load
-    fetchVersion(function(ts) {
-      loadedAt = ts;
-    });
+  function spawnEnemy(boss = false) {
+    const w = player.wave;
+    const type = boss ? 'boss' : Math.random() < Math.min(0.12 + w * 0.012, 0.38) ? 'charger' : Math.random() < 0.18 ? 'tank' : 'grunt';
+    const base = { x: 28 + Math.random()*504, y: -40, type, flash: 0 };
+    if (type === 'boss') Object.assign(base, { r: 42, hp: 340 + w*95, max: 340 + w*95, speed: 42 + w*4, value: 650, xp: 35 });
+    if (type === 'tank') Object.assign(base, { r: 24, hp: 70 + w*14, max: 70 + w*14, speed: 55 + w*6, value: 95, xp: 9 });
+    if (type === 'charger') Object.assign(base, { r: 15, hp: 24 + w*8, max: 24 + w*8, speed: 145 + w*12, value: 55, xp: 6 });
+    if (type === 'grunt') Object.assign(base, { r: 18, hp: 38 + w*10, max: 38 + w*10, speed: 85 + w*8, value: 70, xp: 7 });
+    enemies.push(base);
+  }
 
-    // Every 2 minutes, check if a newer version has been deployed
-    setInterval(function() {
-      if (!loadedAt) return;
-      fetchVersion(function(ts) {
-        if (ts && ts !== loadedAt) {
-          // New deploy detected — reload cleanly
-          window.location.reload(true);
-        }
-      });
-    }, CHECK_INTERVAL);
-  })();
+  function addParticles(x, y, color, n = 10) { for (let i=0; i<n; i++) particles.push({x,y,vx:(Math.random()-.5)*230,vy:(Math.random()-.5)*230,life:.45,color}); }
+  function hit(a,b) { return Math.hypot(a.x-b.x, a.y-b.y) < a.r + b.r; }
+  function gainXp(amount) { player.xp += amount; if (player.xp >= player.nextXp) levelUp(); }
+
+  function levelUp() {
+    player.xp -= player.nextXp; player.level++; player.nextXp = Math.floor(player.nextXp * 1.32 + 12); paused = true;
+    const picks = [...upgradeDefs].sort(() => Math.random() - 0.5).slice(0,3);
+    ui.choices.innerHTML = picks.map((u, i) => `<div class="choice" data-i="${i}"><strong>${u[0]}</strong><p class="subtitle">${u[1]}</p></div>`).join('');
+    ui.upgradeOverlay.classList.remove('hidden');
+    [...ui.choices.children].forEach((el, i) => el.onclick = () => { picks[i][2](player); ui.upgradeOverlay.classList.add('hidden'); paused = false; last = performance.now(); requestAnimationFrame(loop); });
+  }
+
+  function loop(t) {
+    if (!running || paused) return;
+    const dt = Math.min((t - last) / 1000, 0.033); last = t; update(dt); draw(); requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    if (keys.has('ArrowLeft') || keys.has('a')) player.x -= player.speed * dt;
+    if (keys.has('ArrowRight') || keys.has('d')) player.x += player.speed * dt;
+    player.x = Math.max(24, Math.min(536, player.x)); player.hp = Math.min(player.maxHp, player.hp + player.regen * dt);
+    player.wave = 1 + Math.floor(player.score / 850); spawnTimer -= dt; shotTimer -= dt; bossTimer -= dt;
+    if (shotTimer <= 0) { shoot(); shotTimer = player.fireRate; }
+    const spawnRate = Math.max(0.22, 0.9 - player.wave * 0.035);
+    if (spawnTimer <= 0) { spawnEnemy(false); spawnTimer = spawnRate; }
+    if (bossTimer <= 0) { spawnEnemy(true); bossTimer = Math.max(18, 34 - player.wave); }
+
+    stars.forEach(s => { s.y += s.v*dt; if (s.y > 824) { s.y = -4; s.x = Math.random()*560; }});
+    bullets.forEach(b => { b.x += b.vx*dt; b.y += b.vy*dt; }); bullets = bullets.filter(b => b.y > -20 && b.x > -30 && b.x < 590);
+    enemies.forEach(e => { e.y += e.speed*dt; e.x += Math.sin((performance.now()/500) + e.y/70) * (e.type === 'charger' ? 36 : 13) * dt; e.flash = Math.max(0, e.flash - dt); });
+    particles.forEach(p => { p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt; }); particles = particles.filter(p => p.life > 0);
+    orbs.forEach(o => { const d = Math.hypot(player.x-o.x, player.y-o.y); if (d < player.magnet) { o.x += (player.x-o.x)*dt*5; o.y += (player.y-o.y)*dt*5; } else o.y += 45*dt; if (hit({...player,r:22}, {...o,r:8})) { o.dead = true; gainXp(o.v); }}); orbs = orbs.filter(o => !o.dead && o.y < 850);
+
+    for (const b of bullets) for (const e of enemies) if (!e.dead && hit(b,e)) { e.hp -= b.damage; e.flash = .07; b.pierce--; addParticles(b.x,b.y,'#5de7ff',3); if (b.pierce < 0) b.dead = true; if (e.hp <= 0) { e.dead = true; player.score += e.value; orbs.push({x:e.x,y:e.y,v:e.xp}); addParticles(e.x,e.y,e.type==='boss'?'#ffd66b':'#60ffa8', e.type==='boss'?36:14); } }
+    bullets = bullets.filter(b => !b.dead);
+    for (const e of enemies) if (!e.dead && hit(player, e)) { e.dead = true; player.hp -= e.type === 'boss' ? 45 : e.type === 'tank' ? 26 : 16; addParticles(player.x, player.y, '#ff4d6d', 18); }
+    enemies = enemies.filter(e => !e.dead && e.y < 870);
+    if (player.hp <= 0) gameOver(); updateUi();
+  }
+
+  function gameOver() { running = false; best = Math.max(best, player.score); localStorage.setItem(bestKey, best); ui.startOverlay.classList.remove('hidden'); ui.startOverlay.querySelector('h2').textContent = 'Run complete'; ui.startOverlay.querySelector('h1').textContent = `Score ${Math.floor(player.score)}`; ui.startOverlay.querySelector('.subtitle').textContent = 'Start again and try a different upgrade path.'; ui.startOverlay.querySelector('button').textContent = 'Restart game'; }
+  function updateUi() { ui.score.textContent = Math.floor(player.score); ui.wave.textContent = player.wave; ui.level.textContent = player.level; ui.best.textContent = Math.floor(best); ui.hpBar.style.width = `${Math.max(0, player.hp / player.maxHp * 100)}%`; ui.xpBar.style.width = `${player.xp / player.nextXp * 100}%`; ui.upgrades.innerHTML = [`Damage ${Math.round(player.damage)}`, `Fire rate ${(1/player.fireRate).toFixed(1)}/s`, `Shots ${player.spread}`, `Pierce ${player.pierce}`].map(x => `<div class="upgrade"><strong>${x}</strong><small>Current build stat</small></div>`).join(''); }
+
+  function draw() {
+    ctx.clearRect(0,0,560,820);
+    ctx.fillStyle = '#050813'; ctx.fillRect(0,0,560,820);
+    stars.forEach(s => { ctx.fillStyle = `rgba(180,235,255,${s.s/2.8})`; ctx.fillRect(s.x,s.y,s.s,s.s); });
+    ctx.strokeStyle = 'rgba(93,231,255,.08)'; for(let y=0;y<820;y+=42){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(560,y);ctx.stroke();}
+    bullets.forEach(b => { ctx.fillStyle = '#7df6ff'; ctx.shadowColor = '#5de7ff'; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill(); ctx.shadowBlur = 0; });
+    enemies.forEach(e => { ctx.fillStyle = e.flash ? '#fff' : e.type==='boss' ? '#ffd66b' : e.type==='tank' ? '#ff5ca8' : e.type==='charger' ? '#ff4d6d' : '#7a8cff'; ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,7); ctx.fill(); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4); ctx.fillStyle = '#60ffa8'; ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*Math.max(0,e.hp/e.max),4); });
+    orbs.forEach(o => { ctx.fillStyle = '#60ffa8'; ctx.beginPath(); ctx.arc(o.x,o.y,6,0,7); ctx.fill(); });
+    particles.forEach(p => { ctx.globalAlpha = Math.max(0,p.life*2); ctx.fillStyle = p.color; ctx.fillRect(p.x,p.y,3,3); ctx.globalAlpha = 1; });
+    ctx.save(); ctx.translate(player.x, player.y); ctx.fillStyle = '#5de7ff'; ctx.shadowColor = '#5de7ff'; ctx.shadowBlur = 18; ctx.beginPath(); ctx.moveTo(0,-24); ctx.lineTo(19,18); ctx.lineTo(0,9); ctx.lineTo(-19,18); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.shadowBlur = 0;
+    if (paused) { ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0,0,560,820); }
+  }
+
+  addEventListener('keydown', e => { keys.add(e.key); if (e.key === 'p' && running) { paused = !paused; if (!paused) { last = performance.now(); requestAnimationFrame(loop); } } });
+  addEventListener('keyup', e => keys.delete(e.key));
+  canvas.addEventListener('pointermove', e => { const r = canvas.getBoundingClientRect(); player.x = ((e.clientX - r.left) / r.width) * 560; });
+  document.getElementById('startBtn').onclick = reset; document.getElementById('restart').onclick = reset;
+  updateUi(); draw();
+})();
 </script>
-
-<!-- NEWS PAGINATION SCRIPT -->
-<script>
-  var NEWS_DATA = [{"headline": "Toncoin (TON) Price Prediction 2025, 2026, 2027-2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Myro (MYRO) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "PancakeSwap (CAKE) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Algorand (ALGO) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Hedera Hashgraph (HBAR) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Arweave (AR) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Bittensor (TAO) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Uniswap (UNI) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Polkadot (DOT) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Cardano (ADA) Price Prediction: 2025, 2026, 2030", "source": "Benzinga", "timestamp": "2026-02-26T21:06:23.770995+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "CNN Fear & Greed: 44/100 — FEAR", "source": "Market Data", "timestamp": "2026-02-26T21:06:21.505974+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "SEC Form 4: Reed Andrew Phillips  (CIK 0001990997), Figma, Inc.  (CIK 0001579878)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Tanda Stephan B.  (CIK 0001679516), APTARGROUP, INC.  (CIK 0000896622)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Worrell August Daniel  (CIK 0002043679), BlackRock Private Credit Fund  (CIK 0001902649)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Matheis Dennis  (CIK 0001817012), Lucid Diagnostics Inc.  (CIK 0001799011)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: NAVARRE RICHARD A  (CIK 0001213886), Core Natural Resources, Inc.  (CIK 0001710366)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: LINDENBAUM BENNETT D  (CIK 0000927942), LINDENBAUM MATTHEW A  (CIK 0000927943), Basswood Financial Fund, Ltd.  (CIK 0000947724), BASSWOOD CAPITAL MANAGEMENT, L.L.C.  (CIK 0001085393), BASSWOOD FINANCIAL LONG ONLY FUND, L.P.  (CIK 0001538637), BASSWOOD PARTNERS, L.L.C.  (CIK 0001269758), BASSWOOD OPPORTUNITY PARTNERS, L.P.  (CIK 0001085394), BASSWOOD FINANCIAL FUND, L.P.  (CIK 0001519641), Regional", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Burth Jonathan  (CIK 0001886142), Vita Coco Company, Inc.  (CIK 0001482981)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.426171+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Jardon Michael  (CIK 0001882881), EXPRO GROUP HOLDINGS N.V.  (CIK 0001575828)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Mackin James P  (CIK 0001408470), ARTIVION, INC.  (CIK 0000784199)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: MCCASKEY JAMES J  (CIK 0001286842), MIDDLEFIELD BANC CORP  (CIK 0000836147)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "SEC Form 4: Doerr Thomas L Jr  (CIK 0001658147), Kontoor Brands, Inc.  (CIK 0001760965)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Decker Mark Okey Jr  (CIK 0001681625), Chiron Real Estate Inc.  (CIK 0001533615)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Brenner Robert  (CIK 0002006910), Vera Therapeutics, Inc.  (CIK 0001831828)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Anderson Chad  (CIK 0001492840), BLACKBAUD INC  (CIK 0001280058)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Dearborn Joel Alan JR  (CIK 0001724040), WEX Inc.  (CIK 0001309108)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Drew Ann Elena  (CIK 0001834871), WEX Inc.  (CIK 0001309108)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Barkidjija John  (CIK 0001464380), BYLINE BANCORP, INC.  (CIK 0001702750)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "SEC Form 4: Senn Andrew  (CIK 0001916725), Integer Holdings Corp  (CIK 0001114483)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Pedraja Michael  (CIK 0002050860), Employers Holdings, Inc.  (CIK 0001379041)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.425168+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Melin Alf  (CIK 0001841749), TechnipFMC plc  (CIK 0001681459)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Landes Jonathan  (CIK 0001828055), TechnipFMC plc  (CIK 0001681459)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Wenos Vincent  (CIK 0001737057), Allegion plc  (CIK 0001579241)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Huang Tsu Te  (CIK 0001711566), RBB Bancorp  (CIK 0001499422)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "SEC Form 4: Anderson Darby  (CIK 0001471815), Addus HomeCare Corp  (CIK 0001468328)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Siurek Ryan H  (CIK 0001476512), EverCommerce Inc.  (CIK 0001853145)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Valenzuela Victoria  (CIK 0001846998), AppLovin Corp  (CIK 0001751008)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: rahim rami  (CIK 0001560849), Hewlett Packard Enterprise Co  (CIK 0001645590)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "up"}, {"headline": "SEC Form 4: NORTON PIERCE  (CIK 0001283387), ONEOK INC /NEW/  (CIK 0001039684)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Grewal Paul  (CIK 0001851414), Coinbase Global, Inc.  (CIK 0001679788)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Papadimitriou Angelos  (CIK 0001963684), COGNEX CORP  (CIK 0000851205)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Norton James Michael  (CIK 0002082900), OUTFRONT Media Inc.  (CIK 0001579877)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Jennings Owen Britton  (CIK 0002047775), Block, Inc.  (CIK 0001512673)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: BREEN EDWARD D  (CIK 0001223619), DuPont de Nemours, Inc.  (CIK 0001666700)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: McLean Robert Savage  (CIK 0001491311), Enpro Inc.  (CIK 0001164863)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Xu Chuck  (CIK 0002093258), Qnity Electronics, Inc.  (CIK 0002058873)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: SAEGER MARK  (CIK 0001730250), VALLEY NATIONAL BANCORP  (CIK 0000714310)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "SEC Form 4: Gall Brandon  (CIK 0001770781), MGP INGREDIENTS INC  (CIK 0000835011)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Kersey Melissa  (CIK 0001819248), Floor & Decor Holdings, Inc.  (CIK 0001507079)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Turoff James  (CIK 0001863661), HERSHEY CO  (CIK 0000047111)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Hardy Francois  (CIK 0002021269), NEWMONT Corp /DE/  (CIK 0001164727)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Yates David M  (CIK 0001916322), WisdomTree, Inc.  (CIK 0000880631)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Gutierrez-Ramos Jose-Carlos  (CIK 0001667657), DANAHER CORP /DE/  (CIK 0000313616)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Chewning Eric D.  (CIK 0001964855), HUNTINGTON INGALLS INDUSTRIES, INC.  (CIK 0001501585)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.424181+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Cimerola Patrick  (CIK 0001472078), CHOICE HOTELS INTERNATIONAL INC /DE  (CIK 0001046311)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Ling Winnie  (CIK 0001974022), Blend Labs, Inc.  (CIK 0001855747)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Venkatramani Srinivasan  (CIK 0002050301), Blend Labs, Inc.  (CIK 0001855747)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: MORTON ANDREW JOHN  (CIK 0001994231), CITIGROUP INC  (CIK 0000831001)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: McSweeney Erin  (CIK 0001645325), UNITEDHEALTH GROUP INC  (CIK 0000731766)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: McKalip Frederick D.  (CIK 0002079992), RLJ Lodging Trust  (CIK 0001511337)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "SEC Form 4: Champlin Christopher Craig  (CIK 0002100495), Employers Holdings, Inc.  (CIK 0001379041)", "source": "Market Data", "timestamp": "2026-02-26T21:06:19.423178+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Canada’s RBC beats profit estimates on retail banking, wealth management boom", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "up"}, {"headline": "Cuba appears to hold speedboat suspects in provincial hospital", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Mexico demands Paris auction house halt sale of pre-Colombian artifacts", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Goolsbee sees several Fed rate cuts in 2026 but urges caution", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Odds of early Warsh-led Fed rate cuts slide with bullish outlook", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Fed’s Goolsbee forecasts several more rate cuts this year, but not soon", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "US offers $10 million reward for information leading to arrest of Mexican Sinaloa Cartel bosses", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Africa CDC head cites major concerns over data, pathogen sharing in US health deals", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "US regulator may share World Liberty bank application with lawmakers", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "US mortgage rates dip below 6%, but supply remains key", "source": "Market Data", "timestamp": "2026-02-26T21:06:17.187387+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Form 144 GE Vernova Inc. For: 26 February", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.729276+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Form 144 Byline Bank Corp For: 26 February", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.729276+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Form 144 Jazz Pharmaceuticals plc For: 26 February", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.729276+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Form 13F Authentikos Wealth Advisory For: 26 February", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.728271+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Earnings call transcript: Kepco ADR reports strong Q4 2025 results, stock dips", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.728271+00:00", "age": "2m ago", "sentiment": "up"}, {"headline": "Benck Jeff, Benchmark Electronics CEO, sells $547k in stock", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.728271+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Diodes Inc CEO Yu Gary sells $140k in stock", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.728271+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Tutor Perini stock hits all-time high at 89.41 USD", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.727268+00:00", "age": "2m ago", "sentiment": "up"}, {"headline": "Wave Life Sciences at Oppenheimer Conference: Strategic Insights on RNA Medicines", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.727268+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Form 8K UNION BANKSHARES For: 26 February", "source": "Market Data", "timestamp": "2026-02-26T21:06:15.727268+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Technip Energies N.V. (THNPY) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.737340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Blackstone Secured Lending: Why I Am Buying The SaaS Crash", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "Rackspace Technology, Inc. (RXT) Q4 2025 Earnings Call Prepared Remarks Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Ormat Technologies, Inc. (ORA) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Schneider Electric S.E. (SBGSY) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "ACM Research, Inc. (ACMR) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Comex Silver Supplies Continue To Shrink Rapidly", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "GDMN: You Can't Beat Gold And Miners In One Fund", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "up"}, {"headline": "WPP: WPP Is A Contrarian Play For 2026-2028", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Time To Sell Peak Nvidia (Rating Downgrade)", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "down"}, {"headline": "WSP Global Inc. (WSP:CA) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "U.S. Physical Therapy, Inc. (USPH) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Bystronic AG (BYSTF) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Excelerate Energy, Inc. (EE) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Palmer Square Capital BDC Inc. (PSBD) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Gestamp Automoción, S.A. (GMPUF) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Perimeter Solutions, Inc. (PRM) Q4 2025 Earnings Call Transcript", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.736340+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "Vista Energy, S.A.B. de C.V. 2025 Q4 - Results - Earnings Call Presentation", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.735341+00:00", "age": "2m ago", "sentiment": "neutral"}, {"headline": "The Toronto-Dominion Bank 2026 Q1 - Results - Earnings Call Presentation", "source": "Seeking Alpha", "timestamp": "2026-02-26T21:06:14.735341+00:00", "age": "2m ago", "sentiment": "down"}];
-  var NEWS_PER_PAGE = 10;
-  var newsCurrentPage = 0;
-
-  function sentimentArrow(s) {
-    if (s === 'up')   return '<span style="color:#00e5a0;font-size:13px">&#9650;</span>';
-    if (s === 'down') return '<span style="color:#ff4d6d;font-size:13px">&#9660;</span>';
-    return '<span style="color:#ffb830;font-size:13px">&#9658;</span>';
-  }
-
-  function renderNewsPage(page) {
-    var container = document.getElementById('news-container');
-    var info      = document.getElementById('news-page-info');
-    var prevBtn   = document.getElementById('news-prev');
-    var nextBtn   = document.getElementById('news-next');
-
-    if (!NEWS_DATA || NEWS_DATA.length === 0) return;
-
-    var total      = NEWS_DATA.length;
-    var totalPages = Math.ceil(total / NEWS_PER_PAGE);
-    page = Math.max(0, Math.min(page, totalPages - 1));
-    newsCurrentPage = page;
-
-    var start = page * NEWS_PER_PAGE;
-    var end   = Math.min(start + NEWS_PER_PAGE, total);
-    var slice = NEWS_DATA.slice(start, end);
-
-    var html = '';
-    for (var i = 0; i < slice.length; i++) {
-      var item  = slice[i];
-      var even  = (i % 2 === 1) ? 'background:var(--surf2);' : '';
-      html += '<div class="news-row" style="' + even + '">';
-      html += '<span class="news-arrow">' + sentimentArrow(item.sentiment) + '</span>';
-      html += '<span class="news-age muted">' + item.age + '</span>';
-      html += '<span class="news-src muted">' + item.source + '</span>';
-      html += '<span class="news-hl">' + item.headline + '</span>';
-      html += '</div>';
-    }
-    container.innerHTML = html;
-
-    info.textContent = 'Page ' + (page + 1) + ' of ' + totalPages + '  (' + total + ' stories)';
-    prevBtn.disabled = (page === 0);
-    nextBtn.disabled = (page >= totalPages - 1);
-  }
-
-  function newsPage(dir) {
-    renderNewsPage(newsCurrentPage + dir);
-    // Scroll back to news section top so user sees new page
-    document.getElementById('news-container').scrollIntoView({behavior:'smooth', block:'start'});
-  }
-
-  // Initial render on load
-  if (NEWS_DATA && NEWS_DATA.length > 0) {
-    renderNewsPage(0);
-    document.getElementById('news-pagination').style.display = 'flex';
-  }
-</script>
-
 </body>
-
 </html>
